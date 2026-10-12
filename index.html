@@ -1,592 +1,527 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alpha-Track | Registro de Entrenamiento</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>ALPHA TRACK</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default"> 
+    <link rel="apple-touch-icon" href="https://api.dicebear.com/7.x/initials/svg?seed=A&backgroundColor=000000&fontSize=70&fontWeight=700">
+
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { 
+            background: #f0f2f5; 
+            color: #1c1e21; 
+            font-family: -apple-system, sans-serif; 
+            margin: 0; 
+            padding: 10px; 
+            padding-bottom: 80px; 
+        }
+        .header { text-align: center; padding: 10px 0; }
+        .header h1 { 
+            margin: 0; 
+            font-size: 24px; 
+            letter-spacing: -1px; 
+            color: #000000; 
+            text-transform: uppercase; 
+        }
+        .header span { 
+            color: #0095f6; 
+            font-size: 10px; 
+            font-weight: bold; 
+            letter-spacing: 3px; 
+        }
+        
+        .nav { 
+            display: flex; 
+            background: #ffffff; 
+            padding: 6px; 
+            border-radius: 14px; 
+            margin-bottom: 20px; 
+            border: 1px solid #dce2e8; 
+            overflow-x: auto; 
+            gap: 8px; 
+            scrollbar-width: none; 
+        }
+        .nav::-webkit-scrollbar { display: none; }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; min-width: 120px; text-align: center; }
+        .nav-btn { 
+            width: 100%; 
+            background: #f0f2f5; 
+            border: none; 
+            color: #65676b; 
+            padding: 10px 0; 
+            font-weight: 800; 
+            font-size: 12px; 
+            cursor: pointer; 
+            border-radius: 10px; 
+            transition: 0.2s; 
+        }
+        .nav-btn.active { 
+            background: #0095f6; 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.3); 
+        }
+        
+        .day-label { 
+            font-size: 9px; 
+            color: #0095f6; 
+            font-weight: bold; 
+            margin-top: 6px; 
+            text-transform: uppercase; 
+            white-space: nowrap; 
+        }
+        .muscles-label { 
+            font-size: 7px; 
+            color: #65676b; 
+            margin-top: 2px; 
+            text-transform: uppercase; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            width: 100%; 
+        }
+
+        .progress-container { 
+            background: #ffffff; 
+            border-radius: 18px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border: 1px solid #dce2e8; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+        }
+        .progress-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
+        }
+        .progress-title { 
+            font-size: 10px; 
+            color: #0095f6; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+        }
+        .progress-percentage { 
+            font-size: 12px; 
+            font-weight: 900; 
+            color: #1c1e21; 
+        }
+        .progress-bar-bg { 
+            background: #f0f2f5; 
+            height: 8px; 
+            border-radius: 4px; 
+            overflow: hidden; 
+            border: 1px solid #dce2e8; 
+        }
+        .progress-bar-fill { 
+            background: #0095f6; 
+            height: 100%; 
+            width: 0%; 
+            transition: width 0.3s ease; 
+        }
+
+        .card { 
+            background: #ffffff; 
+            border-radius: 18px; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border: 1px solid #dce2e8; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            transition: 0.3s; 
+            position: relative; 
+        }
+        .card.done { 
+            opacity: 0.35; 
+            filter: grayscale(0.5); 
+            border-color: #bdc3c7 !important; 
+            background: #f8f9fa; 
+        }
+
+        .ex-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .ex-title-group { flex: 1; display: flex; flex-direction: column; }
+        .ex-name { font-weight: 800; font-size: 16px; color: #1c1e21; display: block; line-height: 1.2; }
+        
+        .ex-muscle-tag {
+            font-size: 9px; 
+            color: #0095f6; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        .ex-info { 
+            font-size: 11px; 
+            color: #65676b; 
+            font-weight: 600; 
+            background: #f0f2f5; 
+            padding: 3px 7px; 
+            border-radius: 4px; 
+            width: fit-content; 
+            margin-top: 8px;
+            display: inline-block;
+        }
+        
+        .check-container { margin-left: 10px; padding-top: 2px; }
+        input[type="checkbox"] { 
+            width: 26px; 
+            height: 26px; 
+            cursor: pointer; 
+            accent-color: #00ba69; 
+        }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .box { 
+            background: #f8f9fa; 
+            padding: 10px; 
+            border-radius: 10px; 
+            border: 1px solid #dce2e8; 
+        }
+        .box label { 
+            display: block; 
+            font-size: 9px; 
+            color: #0095f6; 
+            text-transform: uppercase; 
+            margin-bottom: 4px; 
+            font-weight: 800; 
+        }
+        input[type="text"] { 
+            background: none; 
+            border: none; 
+            color: #1c1e21; 
+            width: 100%; 
+            font-size: 20px; 
+            font-weight: 900; 
+            outline: none; 
+        }
+        
+        textarea { 
+            width: 100%; 
+            background: #f8f9fa; 
+            border: 1px solid #dce2e8; 
+            border-radius: 10px; 
+            padding: 10px; 
+            color: #1c1e21; 
+            margin-top: 10px; 
+            box-sizing: border-box; 
+            font-family: inherit; 
+            resize: none; 
+            min-height: 40px; 
+            outline: none; 
+            font-size: 13px; 
+        }
+        
+        #save { 
+            position: fixed; 
+            top: 15px; 
+            right: 15px; 
+            width: 8px; 
+            height: 8px; 
+            background: #00ba69; 
+            border-radius: 50%; 
+            display: none; 
+            z-index: 100; 
+            box-shadow: 0 0 10px #00ba69; 
+        }
+
+        .footer-tools { 
+            margin-top: 30px; 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            border-top: 1px solid #dce2e8; 
+            padding-top: 20px; 
+        }
+        .btn-tool { 
+            background: #ffffff; 
+            border: 1px solid #dce2e8; 
+            color: #65676b; 
+            padding: 8px 15px; 
+            border-radius: 8px; 
+            font-size: 10px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+        }
+        .btn-tool:active { background: #f0f2f5; }
     </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased">
+<body>
+    <div id="save"></div>
+    <div class="header"><span>WORKOUT TRACKER</span><h1>ALPHA TRACK</h1></div>
 
-    <!-- Header -->
-    <header class="sticky top-0 z-50 bg-zinc-900/90 backdrop-blur border-b border-zinc-800 px-4 py-3">
-        <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-tight text-amber-500 flex items-center gap-2">
-                ⚡ Alpha-Track
-            </h1>
-            <span id="current-date" class="text-xs text-zinc-400 font-medium bg-zinc-800 px-2.5 py-1 rounded-full"></span>
+    <div class="nav">
+        <div class="nav-item">
+            <button class="nav-btn" id="btn-Lunes" onclick="show('Lunes')">LUNES</button>
+            <span class="day-label">Empuje</span>
+            <span class="muscles-label">Pecho, Hombro, Tríceps</span>
         </div>
-    </header>
-
-    <!-- Day Selector Navigation -->
-    <nav class="bg-zinc-900 border-b border-zinc-800 py-2.5 px-4 sticky top-[53px] z-40 overflow-x-auto">
-        <div class="max-w-md mx-auto flex gap-2 min-w-max" id="day-tabs">
-            <!-- Tabs generated dynamically -->
+        <div class="nav-item">
+            <button class="nav-btn" id="btn-Martes" onclick="show('Martes')">MARTES</button>
+            <span class="day-label">Tracción</span>
+            <span class="muscles-label">Espalda, Bíceps, Antebrazo</span>
         </div>
-    </nav>
-
-    <!-- Main Content Container -->
-    <main class="flex-1 max-w-md w-full mx-auto p-4 pb-24">
-        <div id="day-header" class="mb-4">
-            <!-- Day title and description -->
+        <div class="nav-item">
+            <button class="nav-btn" id="btn-Miércoles" onclick="show('Miércoles')">MIÉRCOLES</button>
+            <span class="day-label">PIERNA A Y ABDOMEN</span>
+            <span class="muscles-label">Cuádriceps, Femoral, Abdomen</span>
         </div>
-        <div id="exercises-container" class="space-y-4">
-            <!-- Exercise cards generated dynamically -->
+        <div class="nav-item">
+            <button class="nav-btn" id="btn-Jueves" onclick="show('Jueves')">JUEVES</button>
+            <span class="day-label">Torso e Hipertrofia</span>
+            <span class="muscles-label">Pecho, Espalda, Hombro, Tríceps</span>
         </div>
-    </main>
+        <div class="nav-item">
+            <button class="nav-btn" id="btn-Viernes" onclick="show('Viernes')">VIERNES</button>
+            <span class="day-label">PIERNA B E HIPERTROFIA</span>
+            <span class="muscles-label">Glúteo, Femoral, Bíceps, Antebrazo</span>
+        </div>
+    </div>
 
-    <!-- Footer / Reset Data -->
-    <footer class="bg-zinc-900 border-t border-zinc-800 p-4 text-center text-xs text-zinc-500">
-        <p>Plan de 6 semanas • Doble Progresión & RIR[span_5](start_span)[span_5](end_span)[span_6](start_span)[span_6](end_span)</p>
-        <button onclick="resetData()" class="mt-2 text-red-400 hover:underline">Reiniciar datos de hoy</button>
-    </footer>
+    <div class="progress-container">
+        <div class="progress-header">
+            <span class="progress-title">Progreso del día</span>
+            <span class="progress-percentage" id="progress-text">0%</span>
+        </div>
+        <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+    </div>
 
-    <!-- App Logic Script -->
-    <script>
-        // Datos completos de rutinas y alternativas basados en Rutina.txt y Rutina alternativa.txt
-        const workoutData = {
-            lunes: {
-                title: "Lunes — Pecho, Hombros y Tríceps",
-                exercises: [
-                    {
-                        id: "lun_1",
-                        name: "Press de pecho en máquina",
-                        sets: 4,
-                        reps: "6–8",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Press de banca con barra olímpica (4 x 6–8)",
-                            "Press de banca con mancuernas (4 x 6–10)",
-                            "Press con mancuernas en banco con ligera inclinación (4 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "lun_2",
-                        name: "Press de hombros en máquina",
-                        sets: 3,
-                        reps: "8–10",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Press de hombros sentado con mancuernas (3 x 8–12)",
-                            "Press militar de pie con barra (3 x 6–10)",
-                            "Press Arnold con mancuernas (3 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "lun_3",
-                        name: "Pec deck o aperturas en polea",
-                        sets: 3,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Aperturas con mancuernas en banco plano (3 x 10–15)",
-                            "Aperturas con mancuernas en banco inclinado (3 x 10–15)",
-                            "Press con mancuernas en banco plano (3 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "lun_4",
-                        name: "Elevaciones laterales",
-                        sets: 4,
-                        reps: "12–20",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Elevaciones laterales con mancuernas de pie (4 x 12–20)",
-                            "Elevaciones laterales sentado en el borde del banco (4 x 12–20)",
-                            "Elevación lateral unilateral apoyando la mano libre (4 x 12–20 por lado)"
-                        ]
-                    },
-                    {
-                        id: "lun_5",
-                        name: "Extensión de tríceps en polea",
-                        sets: 3,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Extensión de tríceps tumbado con mancuernas en banco (3 x 10–15)",
-                            "Press francés con barra EZ (3 x 8–12)",
-                            "Extensión de tríceps por encima de la cabeza con una mancuerna (3 x 10–15)"
-                        ]
-                    }
-                ]
-            },
-            martes: {
-                title: "Martes — Espalda, Deltoides Posteriores y Bíceps",
-                exercises: [
-                    {
-                        id: "mar_1",
-                        name: "Jalón al pecho",
-                        sets: 4,
-                        reps: "8–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Dominadas asistidas (4 x 6–10)",
-                            "Dominadas con banda o estrictas (4 x RIR 1–2)",
-                            "Remo con mancuerna a una mano apoyado en banco (4 x 8–12 por lado)",
-                            "Remo con barra inclinado (4 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "mar_2",
-                        name: "Remo unilateral en máquina",
-                        sets: 3,
-                        reps: "8–12 por lado",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Remo con mancuerna a una mano, apoyando mano y rodilla (3 x 8–12 por lado)",
-                            "Remo unilateral con mancuerna, torso apoyado en banco inclinado (3 x 8–12 por lado)"
-                        ]
-                    },
-                    {
-                        id: "mar_3",
-                        name: "Remo sentado en polea",
-                        sets: 3,
-                        reps: "10–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Remo con barra olímpica inclinado (3 x 8–12)",
-                            "Remo con dos mancuernas con pecho apoyado (3 x 8–12)",
-                            "Remo con mancuernas sentado, torso inclinado (3 x 10–12)"
-                        ]
-                    },
-                    {
-                        id: "mar_4",
-                        name: "Pájaros en máquina / reverse pec deck",
-                        sets: 3,
-                        reps: "12–20",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Pájaros con mancuernas, pecho apoyado en banco inclinado (3 x 12–20)",
-                            "Pájaros con mancuernas inclinado de pie (3 x 12–20)"
-                        ]
-                    },
-                    {
-                        id: "mar_5",
-                        name: "Curl de bíceps con barra",
-                        sets: 3,
-                        reps: "8–12",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Curl alterno con mancuernas (3 x 8–12 por brazo)",
-                            "Curl con barra EZ (3 x 8–12)",
-                            "Curl sentado con mancuernas y espalda apoyada (3 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "mar_6",
-                        name: "Curl martillo",
-                        sets: 3,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Curl martillo alterno con mancuernas (3 x 10–15)",
-                            "Curl martillo sentado (3 x 10–15)",
-                            "Curl martillo cruzado hacia el hombro contrario (3 x 10–15 por brazo)"
-                        ]
-                    }
-                ]
-            },
-            miercoles: {
-                title: "Miércoles — Piernas y Abdomen",
-                exercises: [
-                    {
-                        id: "mie_1",
-                        name: "Hack squat",
-                        sets: 4,
-                        reps: "6–10",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Sentadilla con barra en rack con seguros (4 x 6–10)",
-                            "Sentadilla goblet con mancuerna (4 x 8–12)",
-                            "Sentadilla con dos mancuernas a los lados (4 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "mie_2",
-                        name: "Curl femoral sentado",
-                        sets: 3,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Curl femoral tumbado en máquina (3 x 10–15)",
-                            "Curl femoral deslizante con discos (3 x 8–15)",
-                            "Curl femoral con fitball (3 x 10–15)"
-                        ]
-                    },
-                    {
-                        id: "mie_3",
-                        name: "Prensa de piernas",
-                        sets: 3,
-                        reps: "10–15",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Sentadilla goblet con mancuerna (3 x 10–15)",
-                            "Sentadilla con dos mancuernas (3 x 8–12)",
-                            "Sentadilla búlgara con mancuernas y apoyo en banco (3 x 8–12 por pierna)"
-                        ]
-                    },
-                    {
-                        id: "mie_4",
-                        name: "Extensión de cuádriceps",
-                        sets: 2,
-                        reps: "12–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Sentadilla española con banda o correa (2 x 12–20)",
-                            "Zancadas hacia delante o atrás con mancuernas (2 x 10–12 por pierna)",
-                            "Step-up a banco o plataforma estable (2 x 10–12 por pierna)"
-                        ]
-                    },
-                    {
-                        id: "mie_5",
-                        name: "Gemelos en máquina",
-                        sets: 3,
-                        reps: "10–20",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Elevación de talones de pie con mancuernas (3 x 12–20)",
-                            "Elevación de talones con barra en la espalda (3 x 10–20)",
-                            "Elevación unilateral sujetándose a soporte estable (3 x 12–20 por lado)"
-                        ]
-                    },
-                    {
-                        id: "mie_6",
-                        name: "Crunch abdominal en máquina",
-                        sets: 3,
-                        reps: "12–20",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Crunch en el suelo (3 x 12–20)",
-                            "Crunch con disco ligero sobre el pecho (3 x 10–15)",
-                            "Elevación de rodillas tumbado (3 x 10–15)"
-                        ]
-                    }
-                ]
-            },
-            jueves: {
-                title: "Jueves — Torso: Pecho, Espalda, Hombros y Tríceps",
-                exercises: [
-                    {
-                        id: "jue_1",
-                        name: "Press inclinado en máquina o mancuernas",
-                        sets: 4,
-                        reps: "8–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Press inclinado con mancuernas en banco ajustable (4 x 8–12)",
-                            "Press inclinado con barra olímpica en banco ajustable (4 x 6–10)",
-                            "Press plano con mancuernas (4 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "jue_2",
-                        name: "Jalón al pecho (agarre distinto)",
-                        sets: 3,
-                        reps: "10–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Dominadas con agarre diferente (3 x RIR 1–2)",
-                            "Remo con mancuerna a una mano (3 x 10–12 por lado)",
-                            "Remo con barra inclinado (3 x 8–12)"
-                        ]
-                    },
-                    {
-                        id: "jue_3",
-                        name: "Remo con pecho apoyado",
-                        sets: 3,
-                        reps: "8–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Remo con dos mancuernas con pecho apoyado en banco inclinado (3 x 8–12)",
-                            "Remo con barra olímpica inclinado (3 x 8–12)",
-                            "Remo unilateral con mancuerna apoyado en banco (3 x 8–12 por lado)"
-                        ]
-                    },
-                    {
-                        id: "jue_4",
-                        name: "Fondos asistidos",
-                        sets: 2,
-                        reps: "8–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Press de banca con agarre cerrado (2 x 8–12)",
-                            "Press francés con barra EZ (2 x 8–12)",
-                            "Flexiones con manos a anchura cómoda (2 x RIR 1–2)"
-                        ]
-                    },
-                    {
-                        id: "jue_5",
-                        name: "Elevaciones laterales",
-                        sets: 3,
-                        reps: "12–20",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Elevaciones laterales con mancuernas de pie (3 x 12–20)",
-                            "Elevaciones laterales sentado (3 x 12–20)",
-                            "Elevación lateral unilateral con apoyo en banco (3 x 12–20 por lado)"
-                        ]
-                    },
-                    {
-                        id: "jue_6",
-                        name: "Extensión de tríceps sobre cabeza (polea)",
-                        sets: 2,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Extensión por encima de la cabeza con una mancuerna (2 x 10–15)",
-                            "Extensión tumbado con mancuernas en banco (2 x 10–15)",
-                            "Press francés con barra EZ (2 x 8–12)"
-                        ]
-                    }
-                ]
-            },
-            viernes: {
-                title: "Viernes — Glúteos, Isquiotibiales, Bíceps y Gemelos",
-                exercises: [
-                    {
-                        id: "vie_1",
-                        name: "Hip thrust",
-                        sets: 3,
-                        reps: "8–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Hip thrust con barra y banco estable (3 x 8–12)",
-                            "Puente de glúteos con mancuerna sobre la pelvis (3 x 10–15)",
-                            "Puente de glúteos con peso corporal, pausa arriba (3 x 12–20)"
-                        ]
-                    },
-                    {
-                        id: "vie_2",
-                        name: "Peso muerto rumano",
-                        sets: 2,
-                        reps: "8–12",
-                        targetRir: "RIR 2",
-                        alternatives: [
-                            "Peso muerto rumano con mancuernas (2 x 8–12)",
-                            "Peso muerto rumano con barra olímpica (2 x 8–12)",
-                            "Buenos días con barra ligera (2 x 8–12, solo con experiencia)"
-                        ]
-                    },
-                    {
-                        id: "vie_3",
-                        name: "Curl femoral tumbado",
-                        sets: 3,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Curl femoral sentado en máquina (3 x 10–15)",
-                            "Curl femoral deslizante con talones (3 x 8–15)",
-                            "Curl femoral con fitball (3 x 10–15)"
-                        ]
-                    },
-                    {
-                        id: "vie_4",
-                        name: "Extensión de cadera en polea",
-                        sets: 2,
-                        reps: "12–15 por lado",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Patada de glúteo con mancuerna ligera en banco (2 x 12–15 por lado)",
-                            "Puente de glúteos unilateral (2 x 10–15 por lado)",
-                            "Zancada hacia atrás con mancuernas (2 x 10–12 por lado)"
-                        ]
-                    },
-                    {
-                        id: "vie_5",
-                        name: "Curl bayesiano unilateral en polea",
-                        sets: 3,
-                        reps: "10–15 por lado",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Curl inclinado con mancuernas en banco (3 x 10–15)",
-                            "Curl alterno con mancuernas brazo detrás del torso (3 x 10–15)"
-                        ]
-                    },
-                    {
-                        id: "vie_6",
-                        name: "Curl inclinado con mancuernas",
-                        sets: 2,
-                        reps: "10–15",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Curl sentado con mancuernas y respaldo vertical (2 x 10–15)",
-                            "Curl con barra EZ (2 x 8–12)",
-                            "Curl de concentración con mancuerna (2 x 10–15 por lado)"
-                        ]
-                    },
-                    {
-                        id: "vie_7",
-                        name: "Gemelos en máquina",
-                        sets: 3,
-                        reps: "10–20",
-                        targetRir: "RIR 1–2",
-                        alternatives: [
-                            "Elevación de talones de pie con mancuernas (3 x 12–20)",
-                            "Elevación unilateral con apoyo estable (3 x 12–20 por lado)",
-                            "Elevación con barra en rack seguro (3 x 10–20)"
-                        ]
-                    }
-                ]
+    <div id="list"></div>
+
+    <div class="footer-tools">
+        <button class="btn-tool" onclick="exportBackup()">📥 Exportar Backup</button>
+        <button class="btn-tool" onclick="document.getElementById('importFile').click()">📤 Importar Backup</button>
+        <input type="file" id="importFile" style="display:none" onchange="importBackup(this)">
+    </div>
+
+<script>
+    const routine = {
+        "Lunes": [
+            ["Press de Pecho (Máquina)", "4 series x 8-10 reps", "Pectoral Mayor (Global)"],
+            ["Press Militar (Máquina)", "3 series x 8-10 reps", "Deltoides Anterior"],
+            ["Máquina Contractora (Peck Deck)", "3 series x 10-12 reps", "Pectoral (Fibras Esternales)"],
+            ["Aperturas (Polea)", "3 series x 12-15 reps", "Pectoral (Haz Clavicular / Medio)"],
+            ["Elevaciones Laterales (Mancuernas)", "4 series x 12-15 reps", "Deltoides Lateral"],
+            ["Extensión Unilateral (Polea)", "3 series x 10-12 reps", "Tríceps (Cabeza Lateral y Media)"]
+        ],
+        "Martes": [
+            ["Jalón al Pecho (Polea)", "4 series x 10-12 reps", "Dorsal Ancho y Redondo Mayor"],
+            ["Remo Unilateral (Máquina)", "3 series x 8-10 reps", "Dorsal Ancho y Trapecio Inferior"],
+            ["Remo Sentado (Polea)", "3 series x 10-12 reps", "Trapecio Medio y Romboides"],
+            ["Pull-over (Polea)", "3 series x 12-15 reps", "Dorsal Ancho (Énfasis Aislamiento)"],
+            ["Curl de Bíceps con Barra", "3 series x 8-10 reps", "Bíceps Braquial (Cabeza Corta y Larga)"],
+            ["Curl Martillo (Mancuernas)", "3 series x 10-12 reps", "Braquiorradial y Bíceps (Cabeza Larga)"]
+        ],
+        "Miércoles": [
+            ["Sentadilla en Jaca (Hack Squat)", "4 series x 8-10 reps", "Cuádriceps y Glúteo Mayor"],
+            ["Prensa de Piernas", "3 series x 10-12 reps", "Cuádriceps y Glúteo Mayor"],
+            ["Curl Femoral Sentado", "3 series x 10-12 reps", "Isquiotibiales (Bíceps Femoral y Semitendinoso)"],
+            ["Extensión de Cuádriceps", "3 series x 12-15 reps", "Cuádriceps (Aislamiento Vastos)"],
+            ["Abductores en Máquina", "3 series x 12-15 reps", "Glúteo Medio y Estabilizadores"],
+            ["Máquina de Abdominales", "3 series x 15-20 reps", "Recto Abdominal (Core Anterior)"]
+        ],
+        "Jueves": [
+            ["Press Inclinado (Máquina o Mancuernas)", "4 series x 8-10 reps", "Pectoral Mayor (Haz Clavicular)"],
+            ["Jalón al Pecho (Polea)", "3 series x 10-12 reps", "Dorsal Ancho y Romboides"],
+            ["Deltoide Lateral (Polea o Máquina)", "4 series x 12-15 reps", "Deltoides Lateral (Ancho de Hombros)"],
+            ["Fondos en Máquina Asistida", "3 series x 10-12 reps", "Pectoral Inferior y Tríceps (Global)"],
+            ["Extensión de Tríceps Overhead (Polea)", "3 series x 10-12 reps", "Tríceps (Énfasis Cabeza Larga)"],
+            ["Patada de Tríceps (Polea)", "3 series x 12-15 reps", "Tríceps (Cabeza Lateral y Media)"]
+        ],
+        "Viernes": [
+            ["Hip Thrust en Máquina", "4 series x 8-10 reps", "Glúteo Mayor e Isquiotibiales"],
+            ["Femoral Tumbado", "3 series x 10-12 reps", "Isquiotibiales (Énfasis en Flexión)"],
+            ["Curl Bayesiano Unilateral (Polea)", "3 series x 10-12 reps", "Bíceps Braquial (Énfasis Cabeza Larga)"],
+            ["Curl de Bíceps (Polea)", "3 series x 10-12 reps", "Bíceps Braquial (Tensión Constante)"],
+            ["Curl Concentrado (Mancuernas)", "3 series x 12 reps", "Bíceps Braquial (Pico de Contracción)"],
+            ["Gemelos", "4 series x 12-15 reps", "Gastrocnemio y Sóleo"]
+        ]
+    };
+
+    const syncedExercises = [
+        "curl de biceps inverso (polea)",
+        "curl de muñeca (polea)",
+        "extensiones de muñeca unilateral (polea)"
+    ];
+
+    function getExKey(day, exName) {
+        const clean = exName.replace('★ EXTRA: ', '').trim().toLowerCase();
+        const formattedName = clean.replace(/[^a-z0-9áéíóúñ]/g, '_');
+        
+        // Si el ejercicio está en la lista de sincronizados, usamos un prefijo global
+        if (syncedExercises.includes(clean)) {
+            return 'alpha_v4_sync_' + formattedName;
+        }
+        // Si no, usamos el día para separarlos
+        return 'alpha_v4_' + day + '_' + formattedName;
+    }
+
+    function updateProgress(day) {
+        const exercises = routine[day];
+        if (!exercises) return;
+        let completed = 0;
+        exercises.forEach((_, i) => {
+            const kDone = `alpha_v4_done_${day}_${i}`;
+            if (localStorage.getItem(kDone) === 'true') {
+                completed++;
             }
-        };
+        });
+        const percent = exercises.length > 0 ? Math.round((completed / exercises.length) * 100) : 0;
+        const fillEl = document.getElementById('progress-fill');
+        const textEl = document.getElementById('progress-text');
+        if (fillEl) fillEl.style.width = percent + '%';
+        if (textEl) textEl.textContent = percent + '%';
+    }
 
-        let currentDay = 'lunes';
-        let workoutState = JSON.parse(localStorage.getItem('alpha_track_state')) || {};
+    function show(day) {
+        currentDay = day;
+        const content = document.getElementById('list');
+        let htmlBuffer = '';
+        
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.id === 'btn-' + day));
 
-        // Inicializar fecha actual
-        document.getElementById('current-date').innerText = new Date().toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'short' });
+        routine[day].forEach((ex, i) => {
+            const kData = getExKey(day, ex[0]);
+            const kDone = `alpha_v4_done_${day}_${i}`; 
+            
+            let s = JSON.parse(localStorage.getItem(kData)) || {w:'', r:'', n:''};
+            let isDone = localStorage.getItem(kDone) === 'true';
+            
+            const cardDoneClass = isDone ? 'done' : '';
+            const isChecked = isDone ? 'checked' : '';
+            const escapedExName = ex[0].replace(/'/g, "\\'");
 
-        function saveState() {
-            localStorage.setItem('alpha_track_state', JSON.stringify(workoutState));
-        }
-
-        function renderTabs() {
-            const tabsContainer = document.getElementById('day-tabs');
-            const days = [
-                { key: 'lunes', label: 'Lunes' },
-                { key: 'martes', label: 'Martes' },
-                { key: 'miercoles', label: 'Miércoles' },
-                { key: 'jueves', label: 'Jueves' },
-                { key: 'viernes', label: 'Viernes' }
-            ];
-
-            tabsContainer.innerHTML = days.map(d => `
-                <button onclick="switchDay('${d.key}')" class="px-4 py-2 rounded-xl text-sm font-semibold transition-all ${currentDay === d.key ? 'bg-amber-500 text-zinc-950 shadow-lg shadow-amber-500/20' : 'bg-zinc-900 text-zinc-400 hover:text-zinc-200 border border-zinc-800'}">
-                    ${d.label}
-                </button>
-            `).join('');
-        }
-
-        function switchDay(day) {
-            currentDay = day;
-            renderTabs();
-            renderWorkout();
-        }
-
-        function renderWorkout() {
-            const dayData = workoutData[currentDay];
-            document.getElementById('day-header').innerHTML = `
-                <h2 class="text-xl font-bold text-zinc-100">${dayData.title}</h2>
-                <p class="text-xs text-zinc-400 mt-1">Registra tus pesos y repeticiones. Si una máquina está ocupada, desliza el selector para usar la alternativa[span_7](start_span)[span_7](end_span).</p>
-            `;
-
-            const container = document.getElementById('exercises-container');
-            container.innerHTML = dayData.exercises.map((ex, index) => {
-                const stateKey = `${currentDay}_${ex.id}`;
-                const exState = workoutState[stateKey] || { alternativeIndex: -1, sets: Array(ex.sets).fill({ weight: '', reps: '', rir: '' }) };
-                
-                // Determinar nombre actual (Principal o Alternativa seleccionada)
-                let activeName = ex.name;
-                let activeDetails = `${ex.sets} series x ${ex.reps} reps • ${ex.targetRir}`;
-                if (exState.alternativeIndex >= 0) {
-                    activeName = ex.alternatives[exState.alternativeIndex];
-                }
-
-                // Generar HTML de las series
-                let setsHtml = '';
-                for (let s = 0; s < ex.sets; s++) {
-                    const setData = exState.sets[s] || { weight: '', reps: '', rir: '' };
-                    setsHtml += `
-                        <div class="flex items-center gap-2 bg-zinc-950/60 p-2 rounded-lg border border-zinc-800/80 text-sm">
-                            <span class="text-xs font-bold text-amber-500 w-6">S${s+1}</span>
-                            <div class="flex-1 flex items-center gap-1">
-                                <input type="number" placeholder="Kg" value="${setData.weight}" onchange="updateSet('${ex.id}', ${s}, 'weight', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-center text-zinc-100 focus:outline-none focus:border-amber-500">
-                                <span class="text-xs text-zinc-500">kg</span>
-                            </div>
-                            <div class="flex-1 flex items-center gap-1">
-                                <input type="number" placeholder="Reps" value="${setData.reps}" onchange="updateSet('${ex.id}', ${s}, 'reps', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-center text-zinc-100 focus:outline-none focus:border-amber-500">
-                                <span class="text-xs text-zinc-500">reps</span>
-                            </div>
-                            <div class="w-16">
-                                <input type="text" placeholder="RIR" value="${setData.rir}" onchange="updateSet('${ex.id}', ${s}, 'rir', this.value)" class="w-full bg-zinc-900 border border-zinc-800 rounded px-1.5 py-1 text-center text-zinc-300 text-xs focus:outline-none focus:border-amber-500">
-                            </div>
+            htmlBuffer += `
+                <div class="card ${cardDoneClass}" id="card-${day}-${i}">
+                    <div class="ex-header">
+                        <div class="ex-title-group">
+                            <span class="ex-name">${ex[0]}</span>
+                            <span class="ex-muscle-tag">${ex[2]}</span>
+                            <span class="ex-info">OBJETIVO: ${ex[1]}</span>
                         </div>
-                    `;
-                }
-
-                // Generar opciones del selector de alternativas
-                let altOptionsHtml = `<option value="-1">⭐ Ejercicio Principal (${ex.sets} x ${ex.reps})</option>`;
-                ex.alternatives.forEach((alt, altIdx) => {
-                    altOptionsHtml += `<option value="${altIdx}" ${exState.alternativeIndex === altIdx ? 'selected' : ''}>🔄 Alternativa: ${alt}</option>`;
-                });
-
-                return `
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-md transition-all">
-                        <div class="flex justify-between items-start gap-2 mb-2">
-                            <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded-full">Ejercicio ${index + 1}</span>
-                                <h3 class="font-bold text-base text-zinc-100 mt-1">${activeName}</h3>
-                                <p class="text-xs text-zinc-400">${activeDetails}</p>
-                            </div>
-                        </div>
-
-                        <!-- Selector de Alternativa (Máquina ocupada / En casa) -->
-                        <div class="mb-3">
-                            <label class="text-[11px] text-zinc-400 block mb-1 font-medium">Estado del material:</label>
-                            <select onchange="changeAlternative('${ex.id}', this.value, ${ex.sets})" class="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-amber-400 font-medium focus:outline-none focus:border-amber-500">
-                                ${altOptionsHtml}
-                            </select>
-                        </div>
-
-                        <!-- Series Logger -->
-                        <div class="space-y-2 mt-3 pt-3 border-t border-zinc-800/60">
-                            <div class="flex justify-between text-[11px] font-medium text-zinc-400 px-1">
-                                <span>Serie</span>
-                                <span>Peso</span>
-                                <span>Repeticiones</span>
-                                <span>RIR / Notas</span>
-                            </div>
-                            ${setsHtml}
+                        <div class="check-container">
+                            <input type="checkbox" ${isChecked} onclick="toggleDone('${day}', ${i}, this)">
                         </div>
                     </div>
-                `;
-            }).join('');
-        }
+                    <div class="grid">
+                        <div class="box"><label>Peso (kg)</label><input type="text" value="${s.w}" placeholder="0" oninput="upd('${day}', '${escapedExName}','w',this.value)"></div>
+                        <div class="box"><label>Reps Reales</label><input type="text" value="${s.r}" placeholder="0" oninput="upd('${day}', '${escapedExName}','r',this.value)"></div>
+                    </div>
+                    <textarea placeholder="Notas de la serie..." oninput="upd('${day}', '${escapedExName}','n',this.value)">${s.n}</textarea>
+                </div>`;
+        });
+        content.innerHTML = htmlBuffer;
+        updateProgress(day);
+    }
 
-        function changeAlternative(exId, altIndex, totalSets) {
-            const stateKey = `${currentDay}_${exId}`;
-            if (!workoutState[stateKey]) {
-                workoutState[stateKey] = { alternativeIndex: -1, sets: Array(totalSets).fill({ weight: '', reps: '', rir: '' }) };
-            }
-            workoutState[stateKey].alternativeIndex = parseInt(altIndex);
-            saveState();
-            renderWorkout();
-        }
-
-        function updateSet(exId, setIndex, field, value) {
-            const stateKey = `${currentDay}_${exId}`;
-            const dayData = workoutData[currentDay];
-            const ex = dayData.exercises.find(e => e.id === exId);
-
-            if (!workoutState[stateKey]) {
-                workoutState[stateKey] = { alternativeIndex: -1, sets: Array(ex.sets).fill({ weight: '', reps: '', rir: '' }) };
-            }
-            
-            // Asegurar array de series completo
-            if (!workoutState[stateKey].sets || workoutState[stateKey].sets.length !== ex.sets) {
-                workoutState[stateKey].sets = Array(ex.sets).fill(null).map((_, i) => workoutState[stateKey].sets?.[i] || { weight: '', reps: '', rir: '' });
-            }
-
-            workoutState[stateKey].sets[setIndex][field] = value;
-            saveState();
-        }
-
-        function resetData() {
-            if (confirm("¿Seguro que deseas limpiar los registros guardados para este plan?")) {
-                localStorage.removeItem('alpha_track_state');
-                workoutState = {};
-                renderWorkout();
+    function upd(day, exName, f, v) {
+        const k = getExKey(day, exName);
+        const o = JSON.parse(localStorage.getItem(k)) || {w:'', r:'', n:''};
+        o[f] = v;
+        localStorage.setItem(k, JSON.stringify(o));
+        saveInd();
+    }
+    
+    function toggleDone(day, i, el) {
+        const kDone = `alpha_v4_done_${day}_${i}`;
+        const isDone = el.checked;
+        localStorage.setItem(kDone, isDone);
+        
+        const card = document.getElementById(`card-${day}-${i}`);
+        if (card) {
+            if (isDone) {
+                card.classList.add('done');
+            } else {
+                card.classList.remove('done');
             }
         }
+        updateProgress(day);
+        saveInd();
+    }
 
-        // Inicializar app
-        renderTabs();
-        renderWorkout();
-    </script>
+    function saveInd() {
+        const saveDiv = document.getElementById('save');
+        saveDiv.style.display = 'block';
+        setTimeout(() => {
+            saveDiv.style.display = 'none';
+        }, 1000);
+    }
+
+    function exportBackup() {
+        const backup = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key.startsWith('alpha_v4_')) {
+                backup[key] = localStorage.getItem(key);
+            }
+        }
+        const blob = new Blob([JSON.stringify(backup)], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `alpha_track_backup_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+    }
+
+    function importBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (confirm("¿Importar datos? Esto sobrescribirá los actuales.")) {
+                    Object.keys(data).forEach(key => {
+                        if (key.startsWith('alpha_v4_')) {
+                            localStorage.setItem(key, data[key]);
+                        }
+                    });
+                    alert("¡Importación exitosa!");
+                    location.reload();
+                }
+            } catch (err) {
+                alert("Error al procesar el archivo.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function checkMidnightReset() {
+        const hoy = new Date().toDateString();
+        const ultimaFecha = localStorage.getItem('alpha_last_open');
+
+        if (ultimaFecha && ultimaFecha !== hoy) {
+            Object.keys(routine).forEach(dayName => {
+                routine[dayName].forEach((_, index) => {
+                    const kDone = `alpha_v4_done_${dayName}_${index}`;
+                    localStorage.removeItem(kDone);
+                });
+            });
+        }
+        localStorage.setItem('alpha_last_open', hoy);
+    }
+
+    window.addEventListener('load', () => {
+        checkMidnightReset();
+        const dNum = new Date().getDay();
+        const days = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+        const hoy = routine[days[dNum]] ? days[dNum] : "Lunes";
+        show(hoy);
+
+        setTimeout(() => {
+            const navBar = document.querySelector('.nav');
+            const activeBtn = document.getElementById('btn-' + hoy);
+            if (navBar && activeBtn) {
+                const scrollTarget = activeBtn.offsetLeft - (navBar.offsetWidth / 2) + (activeBtn.offsetWidth / 2);
+                navBar.scrollTo({ left: scrollTarget, behavior: 'smooth' });
+            }
+        }, 400); 
+    });
+</script>
 </body>
 </html>
