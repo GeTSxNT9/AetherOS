@@ -1,17 +1,12 @@
 {
-  "name": "ALPHA TRACK",
-  "short_name": "AlphaTrack",
-  "description": "Workout Tracker",
+  "name": "Alpha Track — Training Log",
+  "short_name": "Alpha Track",
+  "description": "Rutina de hipertrofia y registro personal de progresión.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#080a12",
-  "theme_color": "#6366f1",
-  "icons": [
-    {
-      "src": "https://api.dicebear.com/7.x/initials/svg?seed=A&backgroundColor=000000&fontSize=70&fontWeight=700",
-      "sizes": "512x512",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
+  "orientation": "portrait",
+  "background_color": "#101114",
+  "theme_color": "#101114",
+  "icons": []
 }
