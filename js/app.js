@@ -20,6 +20,7 @@ function init(){
   $('exportBtn').addEventListener('click',exportData); $('exportSettings').addEventListener('click',exportData);
   $('importInput').addEventListener('change',importData);
   if('serviceWorker' in navigator && location.protocol!=='file:') navigator.serviceWorker.register('./sw.js').catch(()=>{});
+  if (window.AlphaAnimations) window.AlphaAnimations.prefetchRoutine().catch(()=>{});
 }
 function renderDayPicker(){
   $('dayPicker').innerHTML=days.map((day,i)=>`<button class="day-button ${day===currentDay?'active':''}" data-day="${day}" aria-pressed="${day===currentDay}"><span>${['L','M','X','J','V'][i]}</span><small>${day.slice(0,3)}</small></button>`).join('');
@@ -35,6 +36,7 @@ function renderSession(){
  const session=window.ALPHA_ROUTINE[currentDay];
  list.innerHTML=session.exercises.map((ex,index)=>renderExercise(ex,index)).join('');
  session.exercises.forEach(ex=>wireExercise(ex)); updateProgress();
+ if (window.AlphaAnimations) window.AlphaAnimations.hydrate(list);
 }
 function activeExercise(ex){const variant=TrackerStore.getVariant(currentDay,ex.id);return variant?{...ex,name:variant.name,sets:variant.sets,reps:variant.reps,selectedAlternative:true}:ex}
 function renderExercise(ex,index){
@@ -43,7 +45,7 @@ function renderExercise(ex,index){
  return `<article class="exercise-card ${done?'is-done':''}" id="card-${ex.id}">
  <div class="card-top"><div class="number">${String(index+1).padStart(2,'0')}</div><div class="exercise-heading"><span class="muscle-tag">${esc(ex.muscle)}</span><h3>${esc(active.name)}</h3><p class="prescription">${active.sets} series <span>·</span> ${esc(active.reps)} reps <span>·</span> ${esc(ex.rir||'RIR 1–2')}</p></div>
  <label class="done-control" title="Marcar ejercicio completado"><input type="checkbox" class="done-check" ${done?'checked':''} aria-label="Marcar ${esc(active.name)} como hecho"><span>✓</span></label></div>
- <div class="technique-placeholder" aria-label="Espacio reservado para animación técnica"><span class="play-symbol">▷</span><span>Demostración técnica</span><small>Animación próximamente</small></div>
+ <div class="technique-placeholder" data-animation-name="${esc(active.name)}" aria-label="Demostración técnica"><span class="play-symbol">▷</span><span>Buscando animación</span><small>Gym visual</small></div>
  <div class="set-list">${Array.from({length:active.sets},(_,i)=>{const s=setData[i]||{};return `<div class="set-row"><span class="set-number">S${i+1}</span><label><span>Kg</span><input inputmode="decimal" type="number" min="0" step="0.5" placeholder="—" data-set="${i}" data-field="weight" value="${esc(s.weight||'')}"></label><label><span>Reps</span><input inputmode="numeric" type="number" min="0" step="1" placeholder="—" data-set="${i}" data-field="reps" value="${esc(s.reps||'')}"></label><label><span>RIR</span><input inputmode="numeric" type="number" min="0" max="10" step="1" placeholder="—" data-set="${i}" data-field="rir" value="${esc(s.rir??'')}"></label></div>`}).join('')}</div>
  <div class="card-actions"><button class="subtle-button alternatives-btn" type="button" aria-expanded="false">⇄ <span>Cambiar ejercicio</span></button><button class="subtle-button note-btn" type="button" aria-expanded="false">ⓘ <span>Técnica</span></button></div>
  <div class="alternatives-panel" hidden><p class="panel-label">ELIGE UNA SUSTITUCIÓN</p>${ex.alternatives.map((alt,i)=>`<button class="alternative-option" type="button" data-alt="${i}"><span><b>${esc(alt[0])}</b><small>${alt[1]} series · ${esc(alt[2])} reps</small></span><span>→</span></button>`).join('')}<button class="reset-variant" type="button">Volver al ejercicio principal</button></div>
