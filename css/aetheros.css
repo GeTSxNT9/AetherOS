@@ -55,3 +55,28 @@ body { width:100%; overflow-x:hidden; }
   .entry-fields { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
   .entry-fields input { height:46px; padding:0 8px; }
 }
+
+
+/* Presentación más limpia: animación discreta y menos texto repetido. */
+.technique-placeholder {
+  width:min(100%, 290px); aspect-ratio: 4 / 3; height:auto; min-height:0; max-height:190px;
+  margin:12px auto 10px; border-radius:13px; background:#111217;
+}
+.technique-placeholder .exercise-animation {
+  object-fit:contain; padding:5px; background:#111217;
+}
+.technique-placeholder .animation-meta {padding:15px 8px 5px;font-size:9px;}
+.single-entry {padding:12px;margin-top:11px;}
+.entry-label {margin-bottom:8px;}
+.entry-label b {font-size:11px;font-weight:650;color:#d8d9e2;}
+.input-hint {display:none!important;}
+.brand-mark {
+  background:transparent;border:1px solid #343947;color:#aeb9df;
+  border-radius:11px;font-size:18px;font-weight:500;letter-spacing:-1px;
+  box-shadow:none;
+}
+@media (max-width:420px) {
+  .technique-placeholder {width:min(100%, 245px);max-height:160px;aspect-ratio:4/3;margin:10px auto;}
+  .technique-placeholder:not(:has(.exercise-animation)) {width:100%;max-width:none;min-height:54px;aspect-ratio:auto;margin:10px 0;}
+  .single-entry {padding:10px;}
+}
