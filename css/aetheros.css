@@ -80,3 +80,29 @@ body { width:100%; overflow-x:hidden; }
   .technique-placeholder:not(:has(.exercise-animation)) {width:100%;max-width:none;min-height:54px;aspect-ratio:auto;margin:10px 0;}
   .single-entry {padding:10px;}
 }
+
+
+/* Registro compacto en una sola fila: animación a la izquierda y valores a la derecha. */
+.exercise-log-row { display:grid; grid-template-columns: minmax(76px, 94px) minmax(0,1fr); gap:10px; align-items:stretch; margin-top:12px; min-width:0; }
+.exercise-log-row .technique-placeholder { width:100%; max-width:none; height:auto; aspect-ratio:3/4; min-height:0; max-height:126px; margin:0; align-self:stretch; border-radius:12px; }
+.exercise-log-row .technique-placeholder .exercise-animation { width:100%; height:100%; object-fit:contain; padding:3px; }
+.exercise-log-row .technique-placeholder:not(:has(.exercise-animation)) { min-height:0; height:auto; aspect-ratio:3/4; padding:6px 3px; display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5px; text-align:center; font-size:9px; overflow-wrap:anywhere; }
+.exercise-log-row .technique-placeholder:not(:has(.exercise-animation)) .play-symbol { width:23px; height:23px; flex-basis:23px; font-size:11px; }
+.exercise-log-row .technique-placeholder:not(:has(.exercise-animation)) > small { margin:0; }
+.exercise-log-row .single-entry { margin:0; padding:10px 9px; display:flex; flex-direction:column; justify-content:center; min-width:0; }
+.exercise-log-row .entry-label { margin-bottom:7px; }
+.exercise-log-row .entry-fields { grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr) minmax(0,.65fr); gap:6px; }
+.exercise-log-row .entry-fields label>span { font-size:10px; margin-left:1px; white-space:nowrap; }
+.exercise-log-row .entry-fields input { height:42px; padding:0 6px; font-size:14px; text-align:center; }
+.exercise-log-row .entry-fields label:first-child input { text-align:left; padding-left:8px; }
+@media (max-width:360px) {
+ .exercise-log-row { grid-template-columns:68px minmax(0,1fr); gap:7px; }
+ .exercise-log-row .single-entry { padding:8px 6px; }
+ .exercise-log-row .entry-fields { gap:4px; }
+ .exercise-log-row .entry-fields label>span { font-size:9px; }
+ .exercise-log-row .entry-fields input { height:40px; font-size:12px; padding:0 3px; }
+}
+@media (min-width:600px) {
+ .exercise-log-row { grid-template-columns:100px minmax(0,1fr); }
+ .exercise-log-row .technique-placeholder { max-height:138px; }
+}
