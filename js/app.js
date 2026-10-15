@@ -1,78 +1,75 @@
 (() => {
 'use strict';
-const days=Object.keys(window.ALPHA_ROUTINE);
+const days=Object.keys(window.AETHER_ROUTINE);
 const $=id=>document.getElementById(id);
-let currentDay=days[0];
+let currentDay=days[0], currentView='training', timerSeconds=120, timerInterval=null;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const todayName=()=>['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()];
 const dateKey=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+const parseNums=v=>String(v??'').split(/[,;\s]+/).map(x=>x.trim()).filter(Boolean).map(Number).filter(Number.isFinite);
+const parseWeights=v=>{const raw=String(v??'').trim();if(!raw)return[];if(!/[;\s]/.test(raw)&&raw.includes(',')&&!raw.includes('.')){const n=Number(raw.replace(',','.'));return Number.isFinite(n)?[n]:[]}return raw.split(/[;\s]+/).map(x=>Number(x.replace(',','.'))).filter(Number.isFinite)};
 function init(){
-  const today=todayName(); currentDay=days.includes(today)?today:'Descanso';
-  $('todayLabel').textContent=new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long'}).format(new Date()).toUpperCase();
-  $('headline').textContent=days.includes(today)?'Hoy toca progresar.':'Tu próximo entrenamiento.';
-  $('subhead').textContent=days.includes(today)?'Concéntrate en la siguiente serie.':'Elige una sesión para consultar tu rutina.';
-  if(TrackerStore.getSessionDate()!==dateKey()){
-    days.forEach(day=>window.ALPHA_ROUTINE[day].exercises.forEach(ex=>TrackerStore.setDone(day,ex.id,false)));
-    TrackerStore.setSessionDate(dateKey());
-  }
-  renderDayPicker(); renderSession();
-  $('settingsBtn').addEventListener('click',()=>$('settingsDialog').showModal());
-  $('exportBtn').addEventListener('click',exportData); $('exportSettings').addEventListener('click',exportData);
-  $('importInput').addEventListener('change',importData);
-  if('serviceWorker' in navigator && location.protocol!=='file:') navigator.serviceWorker.register('./sw.js').catch(()=>{});
-  if (window.AlphaAnimations) window.AlphaAnimations.prefetchRoutine().catch(()=>{});
+ const today=todayName();currentDay=days.includes(today)?today:days[0];
+ $('todayLabel').textContent=new Intl.DateTimeFormat('es-ES',{weekday:'long',day:'numeric',month:'long'}).format(new Date()).toUpperCase();
+ $('headline').textContent=days.includes(today)?'Hoy toca progresar.':'Tu próximo entrenamiento.';
+ $('subhead').textContent='Entrena con intención. Registra cada paso.';
+ renderDayPicker();renderSession();wireNavigation();wireTimer();wireMetrics();
+ $('settingsBtn').addEventListener('click',()=>$('settingsDialog').showModal());$('bottomSettings').addEventListener('click',()=>$('settingsDialog').showModal());
+ $('exportBtn').addEventListener('click',exportData);$('exportSettings').addEventListener('click',exportData);$('importInput').addEventListener('change',importData);
+ $('refreshHistory').addEventListener('click',renderHistory);
+ $('exerciseStatFilter').addEventListener('change',renderStats);
+ if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+ if(window.AetherAnimations)window.AetherAnimations.prefetchRoutine().catch(()=>{});
 }
-function renderDayPicker(){
-  $('dayPicker').innerHTML=days.map((day,i)=>`<button class="day-button ${day===currentDay?'active':''}" data-day="${day}" aria-pressed="${day===currentDay}"><span>${['L','M','X','J','V'][i]}</span><small>${day.slice(0,3)}</small></button>`).join('');
-  $('dayPicker').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{currentDay=btn.dataset.day;renderDayPicker();renderSession()}));
+function wireNavigation(){document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>showView(btn.dataset.view)))}
+function showView(view){currentView=view;['training','history','stats'].forEach(v=>{$(`${v}View`).hidden=v!==view});document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='history')renderHistory();if(view==='stats')renderStats();window.scrollTo({top:0,behavior:'smooth'})}
+function renderDayPicker(){$('dayPicker').innerHTML=days.map((day,i)=>`<button class="day-button ${day===currentDay?'active':''}" data-day="${day}" aria-pressed="${day===currentDay}"><span>${['L','M','X','J','V'][i]}</span><small>${day.slice(0,3)}</small></button>`).join('');$('dayPicker').querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{currentDay=btn.dataset.day;renderDayPicker();renderSession()}))}
+function activeExercise(ex){const variant=AetherStore.getVariant(currentDay,ex.id);return variant?{...ex,name:variant.name,sets:Number(variant.sets)||ex.sets,reps:variant.reps||ex.reps,selectedAlternative:true}:ex}
+function readRecord(ex,active){return AetherStore.getExercise(currentDay,ex.id,active.selectedAlternative?active.name:null)}
+function progression(ex,active,record){
+ const repRange=String(active.reps).match(/(\d+)\s*[–-]\s*(\d+)/);if(!repRange)return null;
+ const top=Number(repRange[2]), reps=parseNums(record.reps), rirs=parseNums(record.rir), weights=parseWeights(record.weight);
+ if(reps.length<active.sets||rirs.length<active.sets||!weights.length||reps.slice(0,active.sets).length<active.sets)return null;
+ const expected=Number((String(ex.rir).match(/\d+/)||['2'])[0]);
+ const lastTarget=/ultima serie\s*1/i.test(ex.rir)?1:expected;
+ const allTop=reps.slice(0,active.sets).every(n=>n>=top);
+ const rirOk=rirs.slice(0,active.sets).every((n,i)=>n>=(i===active.sets-1?lastTarget:expected)&&n<=(i===active.sets-1?lastTarget:expected)+1);
+ if(!allTop||!rirOk)return null;
+ const current=Math.max(...weights);const low=norm(ex.muscle).includes('pierna')||norm(ex.muscle).includes('gluteo')||norm(active.name).includes('sentadilla')||norm(active.name).includes('prensa')||norm(active.name).includes('hip thrust');
+ const dumbbell=norm(active.name).includes('mancuerna');const step=dumbbell?1:(low?5:2.5);const proposed=Math.round((current+step)*2)/2;
+ return {current,proposed,step,top,sets:active.sets};
 }
-function renderSession(){
- const list=$('exerciseList'), isRest=!days.includes(currentDay);
- $('dayTitle').textContent=isRest?'Fin de semana':currentDay;
- $('dayFocus').textContent=isRest?'Recuperación · Actividad suave':window.ALPHA_ROUTINE[currentDay].focus;
- $('exerciseCount').textContent=isRest?'Descanso':`${window.ALPHA_ROUTINE[currentDay].exercises.length} ejercicios`;
- $('restPanel').hidden=!isRest; list.hidden=isRest;
- if(isRest){$('progressText').textContent='—';$('progressFill').style.width='0%';list.innerHTML='';return}
- const session=window.ALPHA_ROUTINE[currentDay];
- list.innerHTML=session.exercises.map((ex,index)=>renderExercise(ex,index)).join('');
- session.exercises.forEach(ex=>wireExercise(ex)); updateProgress();
- if (window.AlphaAnimations) window.AlphaAnimations.hydrate(list);
-}
-function activeExercise(ex){const variant=TrackerStore.getVariant(currentDay,ex.id);return variant?{...ex,name:variant.name,sets:variant.sets,reps:variant.reps,selectedAlternative:true}:ex}
+function progressionMarkup(suggestion){return suggestion?`<div class="progression-tip"><strong>✓ Doble progresión completada</strong><p>${suggestion.sets} series de ${suggestion.top} reps con RIR adecuado. Para la próxima sesión, prueba <b>${suggestion.proposed} kg</b> (subida prudente de ${suggestion.step} kg).</p></div>`:''}
 function renderExercise(ex,index){
- const data=TrackerStore.getExercise(currentDay,ex.id), active=activeExercise(ex), done=TrackerStore.isDone(currentDay,ex.id);
- const setData=data.sets||{};
- return `<article class="exercise-card ${done?'is-done':''}" id="card-${ex.id}">
- <div class="card-top"><div class="number">${String(index+1).padStart(2,'0')}</div><div class="exercise-heading"><span class="muscle-tag">${esc(ex.muscle)}</span><h3>${esc(active.name)}</h3><p class="prescription">${active.sets} series <span>·</span> ${esc(active.reps)} reps <span>·</span> ${esc(ex.rir||'RIR 1–2')}</p></div>
- <label class="done-control" title="Marcar ejercicio completado"><input type="checkbox" class="done-check" ${done?'checked':''} aria-label="Marcar ${esc(active.name)} como hecho"><span>✓</span></label></div>
- <div class="technique-placeholder" data-animation-name="${esc(active.name)}" aria-label="Demostración técnica"><span class="play-symbol">▷</span><span>Buscando animación</span><small>Gym visual</small></div>
- <div class="set-list">${Array.from({length:active.sets},(_,i)=>{const s=setData[i]||{};return `<div class="set-row"><span class="set-number">S${i+1}</span><label><span>Kg</span><input inputmode="decimal" type="number" min="0" step="0.5" placeholder="—" data-set="${i}" data-field="weight" value="${esc(s.weight||'')}"></label><label><span>Reps</span><input inputmode="numeric" type="number" min="0" step="1" placeholder="—" data-set="${i}" data-field="reps" value="${esc(s.reps||'')}"></label><label><span>RIR</span><input inputmode="numeric" type="number" min="0" max="10" step="1" placeholder="—" data-set="${i}" data-field="rir" value="${esc(s.rir??'')}"></label></div>`}).join('')}</div>
- <div class="card-actions"><button class="subtle-button alternatives-btn" type="button" aria-expanded="false">⇄ <span>Cambiar ejercicio</span></button><button class="subtle-button note-btn" type="button" aria-expanded="false">ⓘ <span>Técnica</span></button></div>
- <div class="alternatives-panel" hidden><p class="panel-label">ELIGE UNA SUSTITUCIÓN</p>${ex.alternatives.map((alt,i)=>`<button class="alternative-option" type="button" data-alt="${i}"><span><b>${esc(alt[0])}</b><small>${alt[1]} series · ${esc(alt[2])} reps</small></span><span>→</span></button>`).join('')}<button class="reset-variant" type="button">Volver al ejercicio principal</button></div>
- <div class="note-panel" hidden><p>${esc(ex.note||'Mantén una técnica controlada.')}</p><p class="fineprint">RIR: repeticiones que podrías completar antes del fallo técnico. Compuestos habitualmente RIR 2 (última serie RIR 1); aislamientos RIR 1–2.</p></div>
- <p class="saved-status" aria-live="polite">Guardado automáticamente</p></article>`;
+ const active=activeExercise(ex),record=readRecord(ex,active),done=AetherStore.isDone(currentDay,ex.id),repsHint=`p. ej. ${Array(active.sets).fill(String(active.reps).match(/\d+/)?.[0]||'8').join(', ')}`;
+ const suggestion=progression(ex,active,record);
+ return `<article class="exercise-card ${done?'is-done':''}" id="card-${ex.id}"><div class="card-top"><div class="number">${String(index+1).padStart(2,'0')}</div><div class="exercise-heading"><span class="muscle-tag">${esc(ex.muscle)}</span><h3>${esc(active.name)}</h3><p class="prescription"><b>${active.sets} series</b><span>·</span>${esc(active.reps)} reps<span>·</span>Objetivo ${esc(ex.rir||'RIR 1–2')}</p></div><label class="done-control" title="Marcar ejercicio completado"><input type="checkbox" class="done-check" ${done?'checked':''} aria-label="Marcar ${esc(active.name)} como hecho"><span>✓</span></label></div>
+ <div class="technique-placeholder" data-animation-name="${esc(active.name)}" aria-label="Demostración técnica"><span class="play-symbol">▷</span><span>Buscando animación</span><small>GIF</small></div>
+ <div class="single-entry"><div class="entry-label"><b>Registro del ejercicio</b><span>Una fila · ${active.sets} series prescritas</span></div><div class="entry-fields"><label><span>Peso (kg)</span><input inputmode="decimal" type="text" placeholder="p. ej. 40" data-field="weight" value="${esc(record.weight||'')}"></label><label><span>Reps por serie</span><input inputmode="numeric" type="text" placeholder="${esc(repsHint)}" data-field="reps" value="${esc(record.reps||'')}"></label><label><span>RIR por serie</span><input inputmode="numeric" type="text" placeholder="p. ej. ${Array(active.sets).fill('2').join(', ')}" data-field="rir" value="${esc(record.rir||'')}"></label></div><p class="input-hint">Si todas las series usan el mismo peso, escríbelo una vez (acepta 42,5); reps y RIR van separados por comas.</p></div>
+ <div class="progression-slot">${progressionMarkup(suggestion)}</div>
+ <div class="card-actions"><button class="subtle-button alternatives-btn" type="button" aria-expanded="false">⇄ <span>Cambiar variante</span></button><button class="subtle-button note-btn" type="button" aria-expanded="false">ⓘ <span>Técnica</span></button></div>
+ <div class="alternatives-panel" hidden><p class="panel-label">ELIGE LA VARIANTE QUE HAS HECHO</p>${ex.alternatives.map((alt,i)=>`<button class="alternative-option" type="button" data-alt="${i}"><span><b>${esc(alt[0])}</b><small>${alt[1]} series · ${esc(alt[2])} reps</small></span><span>→</span></button>`).join('')}<button class="reset-variant" type="button">Volver al ejercicio principal</button></div>
+ <div class="note-panel" hidden><p>${esc(ex.note||'Mantén una técnica controlada.')}</p><p class="fineprint">RIR significa las repeticiones que podrías haber hecho antes del fallo técnico.</p></div><p class="saved-status" aria-live="polite">Guardado automáticamente</p></article>`;
 }
-function wireExercise(ex){
- const card=$(`card-${ex.id}`);
- card.querySelector('.done-check').addEventListener('change',e=>{TrackerStore.setDone(currentDay,ex.id,e.target.checked);card.classList.toggle('is-done',e.target.checked);updateProgress()});
- card.querySelectorAll('[data-field]').forEach(input=>input.addEventListener('input',()=>{
-   const d=TrackerStore.getExercise(currentDay,ex.id);d.sets=d.sets||{};const i=input.dataset.set;d.sets[i]=d.sets[i]||{};d.sets[i][input.dataset.field]=input.value;TrackerStore.saveExercise(currentDay,ex.id,d);
-   const status=card.querySelector('.saved-status');status.textContent='Guardado';clearTimeout(status._timer);status._timer=setTimeout(()=>status.textContent='Guardado automáticamente',1200);
- }));
- const altBtn=card.querySelector('.alternatives-btn'), altPanel=card.querySelector('.alternatives-panel');
- altBtn.addEventListener('click',()=>{altPanel.hidden=!altPanel.hidden;altBtn.setAttribute('aria-expanded',String(!altPanel.hidden))});
- card.querySelectorAll('[data-alt]').forEach(btn=>btn.addEventListener('click',()=>{
-   const a=ex.alternatives[Number(btn.dataset.alt)];TrackerStore.setVariant(currentDay,ex.id,{name:a[0],sets:a[1],reps:a[2]});renderSession();
- }));
- card.querySelector('.reset-variant').addEventListener('click',()=>{TrackerStore.setVariant(currentDay,ex.id,null);renderSession()});
- const noteBtn=card.querySelector('.note-btn'), notePanel=card.querySelector('.note-panel');
- noteBtn.addEventListener('click',()=>{notePanel.hidden=!notePanel.hidden;noteBtn.setAttribute('aria-expanded',String(!notePanel.hidden))});
+function renderSession(){const list=$('exerciseList'),isRest=!days.includes(currentDay);$('dayTitle').textContent=isRest?'Recuperación':currentDay;$('dayFocus').textContent=isRest?'Actividad suave':window.AETHER_ROUTINE[currentDay].focus;$('exerciseCount').textContent=isRest?'Descanso':`${window.AETHER_ROUTINE[currentDay].exercises.length} ejercicios`;$('restPanel').hidden=!isRest;list.hidden=isRest;if(isRest){$('progressText').textContent='—';$('progressFill').style.width='0%';list.innerHTML='';return}const session=window.AETHER_ROUTINE[currentDay];list.innerHTML=session.exercises.map(renderExercise).join('');session.exercises.forEach(ex=>wireExercise(ex));updateProgress();if(window.AetherAnimations)window.AetherAnimations.hydrate(list)}
+function wireExercise(ex){const card=$(`card-${ex.id}`),active=activeExercise(ex);card.querySelector('.done-check').addEventListener('change',e=>{AetherStore.setDone(currentDay,ex.id,e.target.checked);card.classList.toggle('is-done',e.target.checked);updateProgress();renderHistory()});card.querySelectorAll('[data-field]').forEach(input=>input.addEventListener('change',()=>{const current=readRecord(ex,active);current[input.dataset.field]=input.value.trim();AetherStore.saveExercise(currentDay,ex.id,current,active.selectedAlternative?active.name:null);const status=card.querySelector('.saved-status');status.textContent='Guardado';card.querySelector('.progression-slot').innerHTML=progressionMarkup(progression(ex,active,current));renderStats();renderHistory()}));
+ const altBtn=card.querySelector('.alternatives-btn'),altPanel=card.querySelector('.alternatives-panel');altBtn.addEventListener('click',()=>{altPanel.hidden=!altPanel.hidden;altBtn.setAttribute('aria-expanded',String(!altPanel.hidden))});card.querySelectorAll('[data-alt]').forEach(btn=>btn.addEventListener('click',()=>{const a=ex.alternatives[Number(btn.dataset.alt)];AetherStore.setVariant(currentDay,ex.id,{name:a[0],sets:a[1],reps:a[2]});renderSession()}));card.querySelector('.reset-variant').addEventListener('click',()=>{AetherStore.setVariant(currentDay,ex.id,null);renderSession()});const noteBtn=card.querySelector('.note-btn'),notePanel=card.querySelector('.note-panel');noteBtn.addEventListener('click',()=>{notePanel.hidden=!notePanel.hidden;noteBtn.setAttribute('aria-expanded',String(!notePanel.hidden))})}
+function updateProgress(){const exs=window.AETHER_ROUTINE[currentDay].exercises,done=exs.filter(ex=>AetherStore.isDone(currentDay,ex.id)).length,pct=exs.length?Math.round(done/exs.length*100):0;$('progressText').textContent=`${pct}%`;$('progressFill').style.width=`${pct}%`}
+function wireTimer(){const display=$('timerDisplay');const paint=()=>{display.textContent=`${String(Math.floor(timerSeconds/60)).padStart(2,'0')}:${String(timerSeconds%60).padStart(2,'0')}`};$('timerPreset').addEventListener('change',()=>{timerSeconds=Number($('timerPreset').value);paint()});$('timerStart').addEventListener('click',()=>{if(timerInterval){clearInterval(timerInterval);timerInterval=null;$('timerStart').textContent='Reanudar';return}if(timerSeconds<=0)timerSeconds=Number($('timerPreset').value);$('timerStart').textContent='Pausar';timerInterval=setInterval(()=>{timerSeconds=Math.max(0,timerSeconds-1);paint();if(timerSeconds===0){clearInterval(timerInterval);timerInterval=null;$('timerStart').textContent='Iniciar';if('vibrate'in navigator)navigator.vibrate([180,80,180])}},1000)});$('timerPlus').addEventListener('click',()=>{timerSeconds+=15;paint()});paint()}
+function wireMetrics(){$('metricForm').addEventListener('submit',e=>{e.preventDefault();let saved=0;for(const [id,type] of [['bodyWeight','weight'],['waistSize','waist']]){const val=$(id).value;if(val!==''){try{AetherStore.saveMetric(type,val);saved++}catch(err){$('metricStatus').textContent=err.message;return}}}if(!saved){$('metricStatus').textContent='Introduce al menos una medida.';return}$('metricStatus').textContent='Medidas guardadas.';$('bodyWeight').value='';$('waistSize').value='';renderStats()})}
+function exportData(){const blob=new Blob([JSON.stringify(AetherStore.exportAll(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`aetheros-backup-${dateKey()}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(!confirm('La copia se combinará con los datos locales. Se conservarán los datos que no coincidan. ¿Continuar?'))return;const n=AetherStore.importAll(data);alert(`Importación completada: ${n} registros. Se recargará la aplicación.`);location.reload()}catch(err){alert(`No se ha importado la copia: ${err.message||'formato no válido'}`)}finally{e.target.value=''}};reader.readAsText(file)}
+function renderHistory(){const sessions=AetherStore.listSessions();$('historyList').innerHTML=sessions.length?sessions.map(s=>{const filled=s.entries.filter(e=>e.weight!==''||e.reps!==''||e.done),volume=s.entries.reduce((sum,e)=>sum+calcVolume(e),0);return `<article class="history-card"><div class="history-head"><div><b>${esc(new Date(`${s.date}T12:00:00`).toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'}))}</b><small>${esc(s.day)} · ${esc(s.focus||'')}</small></div><strong>${Math.round(volume).toLocaleString('es-ES')} kg</strong></div><p>${filled.length} ejercicios con registros · ${s.entries.reduce((n,e)=>n+(e.done?1:0),0)} completados</p><details><summary>Ver ejercicios y resultados</summary><div class="history-entries">${s.entries.map(e=>`<div><b>${esc(e.name)}</b><span>${esc(e.sets)} series · ${esc(e.weight||'—')} kg · reps ${esc(e.reps||'—')} · RIR ${esc(e.rir||'—')}</span></div>`).join('')}</div></details></article>`}).join(''):'<div class="empty-state">Todavía no hay sesiones guardadas. Registra peso, repeticiones o RIR durante un entrenamiento y aparecerá aquí.</div>'}
+function calcVolume(e){const w=parseWeights(e.weight),r=parseNums(e.reps);if(!w.length||!r.length)return 0;return r.reduce((sum,rep,i)=>sum+rep*(w.length===1?w[0]:(w[i]||w[w.length-1]||0)),0)}
+function allEntries(){return AetherStore.listSessions().flatMap(s=>s.entries.map(e=>({...e,date:s.date,day:s.day,volume:calcVolume(e)})))}
+function barChart(items,format=x=>x){if(!items.length)return '<div class="empty-state">Aún faltan datos para mostrar este gráfico.</div>';const max=Math.max(1,...items.map(x=>x.value));return `<div class="bar-chart">${items.map(x=>`<div class="bar-item"><div class="bar-track"><span style="height:${Math.max(3,x.value/max*100)}%"></span></div><b>${esc(format(x.value))}</b><small>${esc(x.label)}</small></div>`).join('')}</div>`}
+function lineChart(items){if(items.length<2)return '<div class="empty-state">Registra al menos dos valores para ver una evolución.</div>';const max=Math.max(...items.map(x=>x.value)),min=Math.min(...items.map(x=>x.value)),span=max-min||1;return `<div class="line-chart">${items.map(x=>`<div class="line-point"><i style="bottom:${8+(x.value-min)/span*72}%"></i><b>${esc(String(x.value))}</b><small>${esc(x.label)}</small></div>`).join('')}</div>`}
+function renderStats(){const sessions=AetherStore.listSessions(),entries=allEntries(),metrics=AetherStore.getMetrics(),volume=entries.reduce((s,e)=>s+e.volume,0),reps=entries.reduce((s,e)=>s+parseNums(e.reps).reduce((a,b)=>a+b,0),0);$('statsSummary').innerHTML=`<div class="stat-tile"><small>Sesiones</small><b>${sessions.length}</b></div><div class="stat-tile"><small>Volumen total</small><b>${Math.round(volume).toLocaleString('es-ES')} kg</b></div><div class="stat-tile"><small>Repeticiones</small><b>${reps}</b></div><div class="stat-tile"><small>Medidas guardadas</small><b>${metrics.length}</b></div>`;
+ const volItems=sessions.slice().reverse().slice(-8).map(s=>({label:`${s.date.slice(5)} ${s.day.slice(0,3)}`,value:s.entries.reduce((sum,e)=>sum+calcVolume(e),0)}));$('volumeChart').innerHTML=barChart(volItems,v=>Math.round(v).toLocaleString('es-ES'));const weekly={};sessions.forEach(s=>{const d=new Date(`${s.date}T12:00:00`),first=new Date(d.getFullYear(),0,1),week=Math.ceil((((d-first)/86400000)+first.getDay()+1)/7),key=`${d.getFullYear()} S${String(week).padStart(2,'0')}`;weekly[key]=(weekly[key]||0)+s.entries.reduce((sum,e)=>sum+calcVolume(e),0)});$('weeklyVolumeChart').innerHTML=barChart(Object.entries(weekly).slice(-8).map(([label,value])=>({label,value})),v=>Math.round(v).toLocaleString('es-ES'));
+ const names=[...new Set(entries.map(e=>e.name))].sort();const select=$('exerciseStatFilter'),previous=select.value;select.innerHTML='<option value="">Selecciona un ejercicio</option>'+names.map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join('');if(names.includes(previous))select.value=previous;const chosen=select.value||names[0];if(chosen&&!select.value)select.value=chosen;const loads=entries.filter(e=>e.name===chosen&&parseNums(e.weight).length).slice(-12).map(e=>({label:e.date.slice(5),value:Math.max(...parseNums(e.weight))}));$('loadChart').innerHTML=lineChart(loads);
+ const repItems=sessions.slice().reverse().slice(-8).map(s=>({label:s.date.slice(5),value:s.entries.reduce((sum,e)=>sum+parseNums(e.reps).reduce((a,b)=>a+b,0),0)}));$('repChart').innerHTML='<h4>Repeticiones por sesión</h4>'+barChart(repItems,v=>v);const freq={};sessions.forEach(s=>{const d=new Date(`${s.date}T12:00:00`),key=`${d.getFullYear()}-S${String(Math.ceil((d.getDate()+new Date(d.getFullYear(),d.getMonth(),1).getDay())/7)).padStart(2,'0')}`;freq[key]=(freq[key]||0)+1});$('frequencyChart').innerHTML='<h4>Frecuencia semanal</h4>'+barChart(Object.entries(freq).slice(-8).map(([label,value])=>({label,value})),v=>`${v} ses.`);
+ const bodyWeight=metrics.filter(m=>m.type==='weight').slice(-12).map(m=>({label:m.date.slice(5),value:m.value}));const bodyWaist=metrics.filter(m=>m.type==='waist').slice(-12).map(m=>({label:m.date.slice(5),value:m.value}));$('bodyChart').innerHTML='<h4>Peso corporal (kg)</h4>'+lineChart(bodyWeight)+'<h4>Cintura (cm)</h4>'+lineChart(bodyWaist);
 }
-function updateProgress(){
- const exs=window.ALPHA_ROUTINE[currentDay].exercises, done=exs.filter(ex=>TrackerStore.isDone(currentDay,ex.id)).length;
- const pct=exs.length?Math.round(done/exs.length*100):0;$('progressText').textContent=`${pct}%`;$('progressFill').style.width=`${pct}%`;
-}
-function exportData(){const blob=new Blob([JSON.stringify(TrackerStore.exportAll(),null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`alpha-track-backup-${dateKey()}.json`;a.click();URL.revokeObjectURL(url)}
-function importData(e){const file=e.target.files?.[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const data=JSON.parse(reader.result);if(confirm('Importar copia de seguridad? Se combinará con los datos locales.')){TrackerStore.importAll(data);location.reload()}}catch{alert('No se ha podido leer el archivo. Comprueba que sea una copia JSON de Alpha Track.')}e.target.value=''};reader.readAsText(file)}
 document.addEventListener('DOMContentLoaded',init);
 })();

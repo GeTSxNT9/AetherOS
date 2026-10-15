@@ -1,13 +1,14 @@
-/* Alpha Track · catálogo de animaciones verificadas por nombre y material.
+/* AetherOS · catálogo de animaciones verificadas por nombre y material.
  * Los GIF pertenecen a Gym visual; conservar atribución y resolución original 180×180.
  * Importante: nunca se usa coincidencia difusa. Si el dataset no contiene un nombre
  * inequívoco para el movimiento, se muestra un aviso en vez de una animación incorrecta.
  */
 (() => {
   'use strict';
-  const DATA_URL = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json';
+  const DATA_URL = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json?v=aetheros-1';
   const RAW_BASE = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
-  const MEDIA_CACHE = 'alpha-track-gymvisual-v2';
+  const MEDIA_CACHE = 'aetheros-gymvisual-v1';
+  const ASSET_VERSION = 'aetheros-1';
   const ATTRIBUTION = '© Gym visual — https://gymvisual.com/';
   let datasetPromise;
   const resultCache = new Map();
@@ -90,7 +91,7 @@
     'crunch en el suelo':['crunch','crunches'],
     'crunch con disco ligero sobre el pecho':['weighted crunch','weighted crunches'],
     'elevacion de rodillas tumbado':['lying leg raise','lying knee raise','flat bench lying leg raise'],
-    'press inclinado en maquina o con mancuernas':['lever incline chest press','incline chest press machine','incline dumbbell press','incline dumbbell bench press'],
+    'press inclinado de pecho en maquina':['lever incline chest press','incline chest press machine','lever incline chest press plate loaded'],
     'press inclinado con mancuernas en banco ajustable':['incline dumbbell press','incline dumbbell bench press','dumbbell incline bench press'],
     'press inclinado con barra olimpica en banco ajustable y rack seguro':['barbell incline bench press','incline barbell bench press'],
     'press plano con mancuernas si el banco inclinado esta ocupado':['dumbbell bench press'],
@@ -120,7 +121,38 @@
     'curl de concentracion con mancuerna':['concentration curl','dumbbell concentration curl'],
     'elevacion con barra en rack seguro':['standing barbell calf raise','barbell standing calf raise']
   };
+
+  const EXTRA_MAP = {
+    'press de pecho sentado en maquina':['lever stack seated chest press male','lever chest press plate loaded','lever chest press version 2','lever chest press'],
+    'press militar en maquina':['lever military press plate loaded','lever shoulder press plate loaded version 3','lever shoulder press','lever shoulder press plate loaded'],
+    'jalon al pecho en polea':['cable lat pulldown','lat pulldown','wide grip lat pulldown','cable pulldown'],
+    'jalon al pecho en polea agarre distinto':['cable close grip front lat pulldown','cable lat pulldown','lat pulldown'],
+    'jalon al pecho con agarre estrecho':['cable close grip front lat pulldown','cable close grip front lat pulldown female','lat pulldown close grip'],
+    'sentadilla hack en maquina':['sled hack squat','hack squat','lever hack squat'],
+    'abdominales en maquina crunch':['lever crunch','ab crunch machine','machine crunch','lever seated crunch'],
+    'remo con pecho apoyado en banco':['dumbbell incline row','chest supported row','incline bench dumbbell row','lever chest supported row'],
+    'remo con pecho apoyado en banco inclinado':['dumbbell incline row','chest supported row','incline bench dumbbell row','lever chest supported row'],
+    'patada de gluteo en polea':['cable glute kickback','cable hip extension','standing cable glute kickback'],
+    'curl bayesiano en polea de espaldas':['single arm bayesian curl','bayesian cable curl','standing one arm cable curl','cable biceps curl behind body'],
+    'curl de biceps inclinado con mancuernas':['dumbbell incline biceps curl','dumbbell incline curl','dumbbell incline alternate bicep curl'],
+    'press frances con barra ez':['ez bar lying triceps extension','ez bar skullcrusher','ez bar skull crusher'],
+    'hip thrust':['barbell hip thrust','hip thrust','smith machine hip thrust'],
+    'curl de biceps con barra':['barbell curl','barbell biceps curl','standing barbell curl'],
+    'remo unilateral en maquina':['lever one arm seated row seated row machine','lever one arm low row plate loaded','lever one arm bent over row plate loaded','one arm machine row'],
+    'press inclinado de pecho en maquina':['lever incline chest press','incline chest press machine','lever incline chest press plate loaded'],
+    'aperturas de pecho en maquina pec deck':['lever pec deck fly','pec deck fly','lever pec deck fly machine'],
+    'aperturas de pecho en poleas crossover':['cable crossover variation','cable crossover','cable chest fly','cable standing fly'],
+    'aperturas inversas en maquina deltoides posterior':['lever reverse pec deck fly','reverse pec deck fly','lever reverse fly'],
+    'curl de biceps con mancuernas en banco inclinado':['dumbbell incline biceps curl','dumbbell incline curl','dumbbell incline alternate bicep curl'],
+    'curl de biceps en polea con brazo detras del torso bayesiano':['single arm bayesian curl','bayesian cable curl','standing one arm cable curl behind body']
+  };
+  Object.entries(EXTRA_MAP).forEach(([name, candidates]) => { MAP[name] = candidates; });
+
   const ALLOWED = new Map(Object.entries(MAP).map(([k,v]) => [norm(k), v.map(norm)]));
+
+  // GIF directos contrastados en las fichas oficiales de Gym visual.
+  // Se usan para impedir que un caché antiguo o un alias del dataset cambie el movimiento.
+  const VERIFIED_OVERRIDES = new Map();
 
   async function fetchAndCache(url) {
     const cache = 'caches' in window ? await caches.open(MEDIA_CACHE).catch(() => null) : null;
@@ -137,13 +169,17 @@
   async function resolve(name) {
     const key = norm(name);
     if (resultCache.has(key)) return resultCache.get(key);
+    const verified = VERIFIED_OVERRIDES.get(key);
+    if (verified) { resultCache.set(key, Promise.resolve(verified)); return Promise.resolve(verified); }
     const promise = getDataset().then(items => {
       const candidates = ALLOWED.get(key);
       if (!items.length || !candidates) return null;
-      const matches = items.filter(item => candidates.includes(norm(item.name)) && item.gif_url);
-      if (matches.length !== 1) return null;
-      const item = matches[0];
-      return {url:new URL(String(item.gif_url).replace(/^\.\//, ''), RAW_BASE).href, name:item.name, attribution:item.attribution || ATTRIBUTION};
+      // Respect the candidate priority: first exact normalized name wins. Never use fuzzy similarity.
+      const item = candidates.map(candidate => items.find(entry => norm(entry.name) === candidate && entry.gif_url)).find(Boolean);
+      if (!item) return null;
+      const url = new URL(String(item.gif_url).replace(/^\.\//, ''), RAW_BASE);
+      url.searchParams.set('v', ASSET_VERSION);
+      return {url:url.href, name:item.name, attribution:item.attribution || ATTRIBUTION};
     });
     resultCache.set(key, promise);
     return promise;
@@ -171,15 +207,14 @@
       node.appendChild(img);
       const meta = document.createElement('div'); meta.className = 'animation-meta';
       const title = document.createElement('span'); title.textContent = match.name;
-      const credit = document.createElement('small'); credit.textContent = match.attribution;
-      meta.append(title, credit); node.appendChild(meta);
+      meta.append(title); node.appendChild(meta);
       node.setAttribute('aria-label', `Animación técnica: ${match.name}. ${match.attribution}`);
     }));
   }
   async function prefetchRoutine() {
-    if (!navigator.onLine || !window.ALPHA_ROUTINE) return;
+    if (!navigator.onLine || !window.AETHER_ROUTINE) return;
     const names = new Set();
-    Object.values(window.ALPHA_ROUTINE).forEach(day => day.exercises.forEach(ex => {
+    Object.values(window.AETHER_ROUTINE).forEach(day => day.exercises.forEach(ex => {
       names.add(ex.name); ex.alternatives.forEach(alt => names.add(alt[0]));
     }));
     const matches = (await Promise.all([...names].map(resolve))).filter(Boolean);
@@ -189,9 +224,9 @@
   }
   async function auditRoutine() {
     const names = new Set();
-    Object.values(window.ALPHA_ROUTINE || {}).forEach(day => day.exercises.forEach(ex => { names.add(ex.name); ex.alternatives.forEach(alt => names.add(alt[0])); }));
+    Object.values(window.AETHER_ROUTINE || {}).forEach(day => day.exercises.forEach(ex => { names.add(ex.name); ex.alternatives.forEach(alt => names.add(alt[0])); }));
     const rows = await Promise.all([...names].map(async name => ({exercise:name, mapped:ALLOWED.has(norm(name)), result:(await resolve(name))?.name || 'SIN GIF EXACTO'})));
     return rows;
   }
-  window.AlphaAnimations = {resolve, hydrate, prefetchRoutine, auditRoutine, attribution:ATTRIBUTION};
+  window.AetherAnimations = {resolve, hydrate, prefetchRoutine, auditRoutine};
 })();
