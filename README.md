@@ -1,23 +1,20 @@
-# Alpha Track — rediseño modular
+# AetherOS — Sessio Log
 
-PWA instalable en JavaScript vainilla, sin frameworks ni dependencias externas.
+Aplicación web personal de entrenamiento, pensada para móvil y con funcionamiento local-first.
 
-## Archivos
-- `index.html`: estructura y carga de módulos.
-- `css/alpha-track.css`: interfaz minimalista oscura, responsive y accesible.
-- `js/routine-data.js`: rutina de 5 días y alternativas de sustitución.
-- `js/tracker-store.js`: persistencia local, exportación/importación y conservación de claves antiguas.
-- `js/app.js`: navegación, detección de día, registro por serie y progreso.
-- `manifest.json`, `sw.js`: instalación y caché offline.
+## Funciones
+- Rutina de cinco días con variantes por ejercicio.
+- Registro compacto por ejercicio de carga, repeticiones por serie y RIR por serie.
+- Sugerencias orientativas de doble progresión cuando se cumplen las repeticiones objetivo y el RIR.
+- Historial de sesiones por fecha y estadísticas de volumen, repeticiones, cargas, frecuencia, peso y cintura.
+- Temporizador de descanso, exportación e importación de copias de seguridad.
+- Icono de AetherOS y diseño adaptable a móvil.
 
 ## Publicación
-Sube el contenido de esta carpeta a la raíz de GitHub Pages (o a la carpeta publicada del repositorio). Abre la URL con HTTPS y carga una vez la app para que el service worker almacene los archivos. En iOS: Safari → Compartir → Añadir a pantalla de inicio.
+Sube los archivos conservando sus rutas y activa GitHub Pages desde la rama y carpeta que uses. No borres el almacenamiento local del navegador si quieres conservar registros anteriores.
 
-## Datos y privacidad
-Los registros nuevos se guardan en `localStorage` del navegador. No hay servidor ni sincronización en la nube. Los valores de la versión anterior con prefijo `alpha_v4_` no se borran y se incluyen en la exportación. Exporta una copia antes de borrar datos del navegador o cambiar de dispositivo.
+## Compatibilidad de datos
+La app mantiene lectura/exportación de las claves antiguas `alpha_track_v2_` y `alpha_v4_` para preservar registros existentes. Los nuevos datos se guardan con el prefijo `aetheros_v1_`.
 
-## Alcance de la fuente
-La rutina y sus series/rangos y alternativas proceden del archivo de rutina facilitado. El archivo proporcionado incluye la rutina completa de alternativas. No se han incluido GIF/WebP reales porque no venían adjuntos; la interfaz reserva un espacio por ejercicio hasta añadir recursos técnicos optimizados. No se añaden progresiones semanales diferentes no especificadas en el documento: el plan está estructurado para 6 semanas con doble progresión.
-
-## Verificación
-La PWA debe servirse por HTTP(S), no abriendo `index.html` como archivo local, para habilitar el service worker. Los datos permanecen en el navegador donde se registran.
+## Animaciones
+Las animaciones se resuelven por listas explícitas de nombres del catálogo de ejercicios; si no existe una coincidencia exacta no se presenta una animación aleatoria. Los GIF de Gym visual se cargan desde el catálogo remoto y se cachean cuando el navegador lo permite. El crédito de los medios se mantiene en Opciones para no ocupar espacio en las tarjetas de ejercicios.

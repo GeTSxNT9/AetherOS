@@ -1,12 +1,15 @@
 {
-  "name": "Alpha Track — Training Log",
-  "short_name": "Alpha Track",
+  "name": "AetherOS — Sessio Log",
+  "short_name": "AetherOS",
   "description": "Rutina de hipertrofia y registro personal de progresión.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#101114",
-  "theme_color": "#101114",
-  "icons": []
+  "background_color": "#090f20",
+  "theme_color": "#090f20",
+  "icons": [
+    {"src":"./icons/aetheros-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+    {"src":"./icons/aetheros-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
 }

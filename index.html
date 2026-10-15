@@ -2,39 +2,31 @@
 <html lang="es">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#101114"><meta name="description" content="Tu rutina de hipertrofia y registro de progresión. Funciona sin conexión.">
+<meta name="theme-color" content="#090f20"><meta name="description" content="AetherOS: tu rutina, tus registros y tu progreso. Privado y local.">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="./manifest.json"><link rel="stylesheet" href="./css/alpha-track.css">
-<title>Alpha Track</title>
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/aetheros-192.png"><link rel="apple-touch-icon" href="./icons/aetheros-192.png"><link rel="manifest" href="./manifest.json"><link rel="stylesheet" href="./css/aetheros.css">
+<title>AetherOS — Sessio Log</title>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="./" aria-label="Alpha Track inicio"><span class="brand-mark">A</span><span>ALPHA <b>TRACK</b><small>TRAINING LOG</small></span></a>
-  <button class="icon-button" id="settingsBtn" aria-label="Opciones" title="Opciones">•••</button>
-</header>
+<header class="topbar"><a class="brand" href="./" aria-label="AetherOS inicio"><img class="brand-icon" src="./icons/aetheros-192.png" alt=""><span>AETHER<b>OS</b><small>S E S S I O&nbsp; L O G</small></span></a><button class="icon-button" id="settingsBtn" aria-label="Opciones" title="Opciones">•••</button></header>
 <main class="shell">
-  <section class="welcome">
-    <p class="eyebrow" id="todayLabel">TU ENTRENAMIENTO</p>
-    <h1 id="headline">Entrena con intención.</h1>
-    <p class="muted" id="subhead">Una sesión cada vez. Progreso que se acumula.</p>
-  </section>
-  <nav class="day-picker" id="dayPicker" aria-label="Elegir día de entrenamiento"></nav>
-  <section class="session-summary">
-    <div><p class="eyebrow">SESIÓN</p><h2 id="dayTitle">Lunes</h2><p class="muted" id="dayFocus"></p></div>
-    <div class="completion"><strong id="progressText">0%</strong><span>completado</span></div>
-    <div class="progress-track"><span id="progressFill"></span></div>
-  </section>
-  <section class="session-tools">
-    <span id="exerciseCount">0 ejercicios</span><span>Descanso: <b>2–3 min</b> compuestos · <b>1–2 min</b> aislamientos</span>
-  </section>
-  <section id="exerciseList" class="exercise-list" aria-live="polite"></section>
-  <section id="restPanel" class="rest-panel" hidden><span class="rest-icon">↟</span><h3>Día de recuperación</h3><p>Paseos, movilidad u otra actividad ligera si te apetece.</p></section>
-  <section class="guidance">
-    <details><summary>Guía de progresión</summary><div class="details-body"><p><b>Doble progresión.</b> Mantén la carga y suma repeticiones dentro del rango. Cuando completes el rango en todas las series con la técnica y RIR previstos, aumenta ligeramente la carga y vuelve a la parte baja del rango.</p><p><b>Esfuerzo.</b> Compuestos habitualmente a RIR 2 (última serie RIR 1); aislamientos a RIR 1–2. RIR 2 significa que podrías hacer aproximadamente dos repeticiones más.</p><p><b>Calentamiento.</b> 5–8 minutos generales y series de aproximación progresivas.</p><p><b>Plan.</b> 6 semanas · 5 días por semana · sesiones orientativas de 75–100 minutos. Revisa técnica, progreso y recuperación al finalizar.</p></div></details>
-    <details><summary>Recuperación y seguimiento</summary><div class="details-body"><p>El documento de rutina recomienda valorar mantenimiento o déficit moderado según la evolución real, proteína orientativa de 160–200 g/día, 2–3 sesiones opcionales de cardio moderado de 20–30 minutos y dormir 7–9 horas.</p><p>Registra ejercicio, variante, peso, repeticiones y RIR. Usa medias semanales de peso y mide cintura una vez por semana.</p></div></details>
-  </section>
-  <footer><span>ALPHA TRACK · PERSONAL TRAINING</span><button class="text-button" id="exportBtn">Exportar datos</button><label class="text-button import-label">Importar<input id="importInput" type="file" accept="application/json"></label></footer>
+<section class="welcome"><p class="eyebrow" id="todayLabel">TU ENTRENAMIENTO</p><h1 id="headline">Entrena con intención.</h1><p class="muted" id="subhead">Una sesión cada vez. Progreso que se acumula.</p></section>
+<nav class="main-nav" aria-label="Secciones"><button data-view="training" class="nav-tab active">Entrenar</button><button data-view="history" class="nav-tab">Historial</button><button data-view="stats" class="nav-tab">Estadísticas</button></nav>
+<section id="trainingView" class="view-panel">
+<nav class="day-picker" id="dayPicker" aria-label="Elegir día de entrenamiento"></nav>
+<section class="session-summary"><div><p class="eyebrow">SESIÓN</p><h2 id="dayTitle">Lunes</h2><p class="muted" id="dayFocus"></p></div><div class="completion"><strong id="progressText">0%</strong><span>completado</span></div><div class="progress-track"><span id="progressFill"></span></div></section>
+<section class="session-tools"><span id="exerciseCount">0 ejercicios</span><span>Descanso: <b>2–3 min</b> compuestos · <b>1–2 min</b> aislamientos</span></section>
+<div class="timer-bar"><label>Descanso <select id="timerPreset"><option value="60">60 s</option><option value="90">90 s</option><option value="120" selected>2 min</option><option value="180">3 min</option></select></label><strong id="timerDisplay">02:00</strong><button id="timerStart" class="small-button">Iniciar</button><button id="timerPlus" class="small-button">+15 s</button></div>
+<section id="exerciseList" class="exercise-list" aria-live="polite"></section>
+<section id="restPanel" class="rest-panel" hidden><span class="rest-icon">↟</span><h3>Día de recuperación</h3><p>Paseos, movilidad u otra actividad ligera si te apetece.</p></section>
+<section class="body-metrics card"><h2>Seguimiento corporal <small>(opcional)</small></h2><form id="metricForm" class="metric-form"><label>Peso corporal (kg)<input id="bodyWeight" inputmode="decimal" type="number" min="1" max="500" step="0.1" placeholder="p. ej. 78.4"></label><label>Cintura (cm)<input id="waistSize" inputmode="decimal" type="number" min="1" max="300" step="0.1" placeholder="p. ej. 82"></label><button class="primary-button" type="submit">Guardar medidas de hoy</button></form><p id="metricStatus" class="fineprint"></p></section>
+<section class="guidance"><details><summary>Cómo funciona la doble progresión</summary><div class="details-body"><p>Registra las repeticiones y el RIR de cada serie separados por comas, por ejemplo <b>8, 8, 8, 8</b> y <b>2, 2, 2, 1</b>. Cuando todas las series llegan al máximo del rango con el RIR objetivo, AetherOS propone una subida prudente de carga.</p><p>Las recomendaciones son orientativas: confirma siempre que la técnica y el esfuerzo fueron correctos antes de aumentar peso.</p></div></details></section>
+</section>
+<section id="historyView" class="view-panel" hidden><div class="section-head"><div><p class="eyebrow">TU RECORRIDO</p><h2>Historial de sesiones</h2></div><button class="small-button" id="refreshHistory">Actualizar</button></div><div id="historyList" class="history-list"></div></section>
+<section id="statsView" class="view-panel" hidden><div class="section-head"><div><p class="eyebrow">DATOS REALES</p><h2>Estadísticas</h2></div></div><div class="stats-grid" id="statsSummary"></div><section class="card"><h3>Volumen por sesión</h3><p class="muted">Suma de peso × repeticiones registradas.</p><div id="volumeChart" class="chart" aria-label="Gráfico de volumen por sesión"></div><h3>Volumen semanal</h3><div id="weeklyVolumeChart" class="chart" aria-label="Comparación de volumen semanal"></div></section><section class="card"><h3>Evolución de cargas</h3><p class="muted">Carga máxima registrada por ejercicio.</p><label class="chart-filter">Ejercicio <select id="exerciseStatFilter"></select></label><div id="loadChart" class="chart" aria-label="Gráfico de cargas"></div></section><section class="card"><h3>Repeticiones y frecuencia</h3><div id="repChart" class="chart"></div><div id="frequencyChart" class="chart"></div></section><section class="card"><h3>Peso corporal y cintura</h3><div id="bodyChart" class="chart"></div></section></section>
+<section class="backup-strip"><button class="text-button" id="exportBtn">Exportar copia de seguridad</button><label class="text-button import-label">Importar copia<input id="importInput" type="file" accept="application/json"></label></section>
 </main>
-<dialog id="settingsDialog" class="settings-dialog"><form method="dialog"><div class="dialog-head"><h2>Opciones</h2><button class="icon-button" aria-label="Cerrar">×</button></div><p>Los registros se guardan automáticamente en este navegador. Los datos de la versión anterior se mantienen en el dispositivo y se incluyen en la exportación.</p><button class="primary-button" id="exportSettings" type="button">Exportar copia de seguridad</button><p class="fineprint">La app funciona sin conexión después de la primera carga. No envía tus datos a ningún servidor.</p><button class="secondary-button full" value="close">Cerrar</button></form></dialog>
-<script src="./js/routine-data.js" defer></script><script src="./js/tracker-store.js" defer></script><script src="./js/exercise-animations-v3.js" defer></script><script src="./js/app.js" defer></script>
+<nav class="bottom-nav" aria-label="Navegación rápida"><button data-view="training" class="active"><span>⌂</span>Entrenar</button><button data-view="history"><span>◷</span>Historial</button><button data-view="stats"><span>▥</span>Estadísticas</button><button id="bottomSettings"><span>⚙</span>Opciones</button></nav>
+<dialog id="settingsDialog" class="settings-dialog"><form method="dialog"><div class="dialog-head"><h2>AetherOS · Opciones</h2><button class="icon-button" aria-label="Cerrar">×</button></div><p>Los registros se guardan en este dispositivo. Se conservan los registros anteriores para no perder datos ya guardados.</p><button class="primary-button" id="exportSettings" type="button">Crear copia de seguridad</button><p class="fineprint">Sincronización entre dispositivos: no activada. Los GIF de ejercicios pertenecen a Gym visual; el crédito se conserva aquí para no sobrecargar la pantalla de entrenamiento.</p><p><a href="https://gymvisual.com/" target="_blank" rel="noopener">© Gym visual</a></p><button class="secondary-button full" value="close">Cerrar</button></form></dialog>
+<script src="./js/routine-data.js" defer></script><script src="./js/tracker-store.js" defer></script><script src="./js/exercise-animations.js" defer></script><script src="./js/app.js" defer></script>
 </body></html>
