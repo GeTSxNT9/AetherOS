@@ -10,3 +10,48 @@
 @media(min-width:600px){.shell{padding-left:24px;padding-right:24px}.exercise-card{padding:20px}.technique-placeholder{max-height:340px}.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(780px,100%);border-left:1px solid #2c2e37;border-right:1px solid #2c2e37;border-radius:16px 16px 0 0}.main-nav{border-radius:12px}}
 @media(max-width:380px){.shell{padding-left:11px;padding-right:11px}.exercise-card{padding:12px}.card-top{gap:8px}.entry-fields{gap:6px}.entry-fields input{padding:0 6px;font-size:13px}.entry-label>span{width:100%}.timer-bar{gap:6px}.timer-bar strong{font-size:15px}.technique-placeholder{min-height:110px}.nav-tab{font-size:11px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;scroll-behavior:auto!important}}
+
+
+/* Ajustes de estabilidad visual móvil (iOS / pantallas estrechas) */
+html { width:100%; overflow-x:hidden; }
+body { width:100%; overflow-x:hidden; }
+.topbar { padding-top: env(safe-area-inset-top); }
+/* La navegación no se pega al borde superior: evita que se mezcle con la barra de estado. */
+.main-nav { position:relative; top:auto; z-index:1; }
+.shell { width:100%; max-width:780px; margin-inline:auto; }
+.exercise-list, .exercise-card, .card-top, .exercise-heading, .single-entry { min-width:0; }
+.exercise-card { overflow:hidden; }
+.technique-placeholder {
+  width:100%; height:auto; aspect-ratio:1 / 1; max-width:100%; max-height:280px; min-height:0;
+  margin:14px auto 13px; padding:0; flex:0 0 auto;
+}
+.technique-placeholder .exercise-animation {
+  position:absolute; inset:0; width:100%; height:100%; max-width:100%; max-height:100%;
+  object-fit:contain; object-position:center; display:block;
+}
+/* Si no hay un GIF inequívoco, el aviso es compacto y no deja un gran hueco vacío. */
+.technique-placeholder:not(:has(.exercise-animation)) {
+  aspect-ratio:auto; height:auto; min-height:68px; max-height:none; padding:12px;
+  display:flex; flex-wrap:wrap; justify-content:flex-start; align-items:center; gap:9px;
+}
+.technique-placeholder:not(:has(.exercise-animation)) > small { margin-left:auto; }
+.technique-placeholder .animation-meta { z-index:2; }
+.bottom-nav { padding-bottom:calc(8px + env(safe-area-inset-bottom)); }
+@media (min-width:600px) {
+  .technique-placeholder { max-height:320px; }
+  .technique-placeholder:not(:has(.exercise-animation)) { max-height:none; }
+}
+@media (max-width:420px) {
+  .topbar { padding-left:16px; padding-right:16px; }
+  .shell { padding-left:14px; padding-right:14px; }
+  .welcome { padding-top:16px; padding-bottom:18px; }
+  .main-nav { gap:6px; }
+  .nav-tab { padding:10px 4px; font-size:11px; }
+  .session-summary { padding:16px 15px 21px; grid-template-columns:minmax(0,1fr) auto; }
+  .session-summary h2 { font-size:20px; }
+  .exercise-card { padding:14px; }
+  .exercise-heading h3 { font-size:16px; }
+  .technique-placeholder { max-height: min(82vw, 320px); }
+  .entry-fields { grid-template-columns:repeat(3,minmax(0,1fr)); gap:7px; }
+  .entry-fields input { height:46px; padding:0 8px; }
+}
