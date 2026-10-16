@@ -198,3 +198,52 @@ body { width:100%; overflow-x:hidden; }
   .exercise-card .exercise-log-row .entry-fields { gap: 3px !important; }
   .exercise-card .exercise-log-row .entry-fields input { font-size: 12px !important; padding: 0 2px !important; }
 }
+
+/* AetherOS v2.0.5 — distribución equilibrada 50/50 entre GIF y registro. */
+.exercise-card .exercise-log-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+}
+.exercise-card .exercise-log-row > .technique-placeholder {
+  width: 100% !important;
+  max-width: none !important;
+  height: 132px !important;
+  max-height: 132px !important;
+  min-height: 132px !important;
+  aspect-ratio: auto !important;
+  align-self: stretch !important;
+  position: relative !important;
+}
+.exercise-card .exercise-log-row > .technique-placeholder .exercise-animation {
+  object-fit: contain !important;
+  padding: 5px !important;
+}
+.exercise-card .exercise-log-row > .single-entry {
+  padding: 9px 8px !important;
+  min-width: 0 !important;
+  overflow: hidden;
+}
+.exercise-card .exercise-log-row .entry-label { margin-bottom: 8px !important; }
+.exercise-card .exercise-log-row .entry-label b { font-size: 12px !important; }
+.exercise-card .exercise-log-row .entry-fields {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr) minmax(0, .7fr) !important;
+  gap: 5px !important;
+}
+.exercise-card .exercise-log-row .entry-fields label > span {
+  font-size: 10px !important;
+  letter-spacing: 0 !important;
+}
+.exercise-card .exercise-log-row .entry-fields input {
+  height: 42px !important;
+  font-size: 13px !important;
+  padding: 0 3px !important;
+}
+@media (max-width: 360px) {
+  .exercise-card .exercise-log-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 7px !important; }
+  .exercise-card .exercise-log-row > .technique-placeholder { height: 124px !important; min-height: 124px !important; max-height: 124px !important; }
+  .exercise-card .exercise-log-row > .single-entry { padding: 7px 5px !important; }
+  .exercise-card .exercise-log-row .entry-fields { gap: 3px !important; }
+  .exercise-card .exercise-log-row .entry-fields label > span { font-size: 9px !important; }
+  .exercise-card .exercise-log-row .entry-fields input { height: 40px !important; font-size: 12px !important; }
+}
