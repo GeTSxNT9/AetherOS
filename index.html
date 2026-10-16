@@ -4,14 +4,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#101114"><meta name="description" content="AetherOS: tu rutina, tus registros y tu progreso. Privado y local.">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" type="image/png" sizes="192x192" href="./icons/aetheros-192.png"><link rel="apple-touch-icon" href="./icons/aetheros-192.png"><link rel="manifest" href="./manifest.json"><link rel="stylesheet" href="./css/aetheros.css?v=2.0.7">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/aetheros-192.png"><link rel="apple-touch-icon" href="./icons/aetheros-192.png"><link rel="manifest" href="./manifest.json"><link rel="stylesheet" href="./css/aetheros.css?v=2.0.8">
 <title>AetherOS — Sessio Log</title>
 </head>
 <body>
-<header class="topbar"><a class="brand" href="./" aria-label="AetherOS inicio"><span class="brand-mark">A</span><span>AETHER<b>OS</b><small>S E S S I O&nbsp; L O G</small></span></a><button class="icon-button" id="settingsBtn" aria-label="Opciones" title="Opciones">•••</button></header>
+<header class="topbar"><a class="brand" href="./" aria-label="AetherOS inicio"><span class="brand-mark" aria-hidden="true">A</span><span class="brand-word">AETHER<b>OS</b><small>S E S S I O&nbsp; L O G</small></span></a><button class="icon-button" id="settingsBtn" aria-label="Opciones" title="Opciones">•••</button></header>
 <main class="shell">
 <section class="welcome"><p class="eyebrow" id="todayLabel">TU ENTRENAMIENTO</p><h1 id="headline">Entrena con intención.</h1><p class="muted" id="subhead">Una sesión cada vez. Progreso que se acumula.</p></section>
-<nav class="main-nav" aria-label="Secciones"><button data-view="training" class="nav-tab active">Entrenar</button><button data-view="history" class="nav-tab">Historial</button><button data-view="stats" class="nav-tab">Estadísticas</button></nav>
 <section id="trainingView" class="view-panel">
 <nav class="day-picker" id="dayPicker" aria-label="Elegir día de entrenamiento"></nav>
 <section class="session-summary"><div><p class="eyebrow">SESIÓN</p><h2 id="dayTitle">Lunes</h2><p class="muted" id="dayFocus"></p></div><div class="completion"><strong id="progressText">0%</strong><span>completado</span></div><div class="progress-track"><span id="progressFill"></span></div></section>
@@ -28,5 +27,5 @@
 </main>
 <nav class="bottom-nav" aria-label="Navegación rápida"><button data-view="training" class="active"><span>⌂</span>Entrenar</button><button data-view="history"><span>◷</span>Historial</button><button data-view="stats"><span>▥</span>Estadísticas</button><button id="bottomSettings"><span>⚙</span>Opciones</button></nav>
 <dialog id="settingsDialog" class="settings-dialog"><form method="dialog"><div class="dialog-head"><h2>AetherOS · Opciones</h2><button class="icon-button" aria-label="Cerrar">×</button></div><p>Los registros se guardan en este dispositivo. Puedes exportar una copia de seguridad cuando quieras.</p><button class="primary-button" id="exportSettings" type="button">Crear copia de seguridad</button><p class="fineprint">Sincronización entre dispositivos: no activada. Los registros permanecen en este dispositivo y puedes exportar una copia de seguridad.</p><button class="secondary-button full" value="close">Cerrar</button></form></dialog>
-<script src="./js/routine-data.js" defer></script><script src="./js/tracker-store.js" defer></script><script src="./js/exercise-animations.js" defer></script><script src="./js/app.js?v=2.0.7" defer></script>
+<script src="./js/routine-data.js" defer></script><script src="./js/tracker-store.js" defer></script><script src="./js/exercise-animations.js" defer></script><script src="./js/app.js?v=2.0.8" defer></script>
 </body></html>
