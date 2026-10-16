@@ -291,3 +291,37 @@ body { width:100%; overflow-x:hidden; }
   .exercise-card .exercise-log-row .entry-fields { grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr) minmax(0, .7fr) !important; gap: 3px !important; }
   .exercise-card .exercise-log-row .entry-fields input { padding: 0 2px !important; font-size: 11px !important; }
 }
+
+
+/* v2.0.7: fuerza dos mitades iguales; selector de máxima prioridad para anular reglas heredadas. */
+#exerciseList .exercise-card .exercise-log-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  width: 100% !important;
+  gap: 8px !important;
+  box-sizing: border-box !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder,
+#exerciseList .exercise-card .exercise-log-row > .single-entry {
+  grid-column: auto !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder {
+  height: 132px !important; min-height: 132px !important; max-height: 132px !important;
+  aspect-ratio: auto !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .single-entry { padding: 9px 7px !important; overflow: hidden !important; }
+#exerciseList .exercise-card .exercise-log-row .entry-fields {
+  display: grid !important; grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr) minmax(0, .7fr) !important; gap: 4px !important; min-width: 0 !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields label,
+#exerciseList .exercise-card .exercise-log-row .entry-fields input { min-width: 0 !important; width: 100% !important; box-sizing: border-box !important; }
+@media (max-width: 360px) {
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 6px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .technique-placeholder { height: 120px !important; min-height: 120px !important; max-height: 120px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields { grid-template-columns: minmax(0,1.1fr) minmax(0,.8fr) minmax(0,.7fr) !important; gap: 3px !important; }
+}
