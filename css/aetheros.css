@@ -105,7 +105,7 @@ body { width:100%; overflow-x:hidden; }
 @media (min-width:600px) {
  .exercise-log-row { grid-template-columns:100px minmax(0,1fr); }
  .exercise-log-row .technique-placeholder { max-height:138px; }
-
+}
 
 /* AetherOS v2.0.4 — layout definitivo: GIF miniatura junto al registro. */
 .exercise-card .exercise-log-row {
@@ -375,6 +375,115 @@ body { width:100%; overflow-x:hidden; }
   #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, .88fr) minmax(0, 1.12fr) !important; gap: 7px !important; }
   #exerciseList .exercise-card .exercise-log-row > .technique-placeholder { height: 124px !important; min-height: 124px !important; max-height: 124px !important; }
   #exerciseList .exercise-card .exercise-log-row > .single-entry { padding: 8px 6px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields { gap: 3px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields label > span { font-size: 9px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields input { font-size: 12px !important; }
+}
+
+
+/* v2.0.9 — ajustes aplicados sobre el repositorio actual */
+.topbar {
+  height: 88px !important;
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+}
+.brand { gap: 13px !important; font-size: 16px !important; letter-spacing: 1.7px !important; }
+.brand-mark { width: 44px !important; height: 44px !important; font-size: 21px !important; }
+.brand small { font-size: 9px !important; letter-spacing: 2.6px !important; }
+/* No hay navegación superior en el HTML: ocultar cualquier pestaña residual de versiones antiguas. */
+.main-nav, .nav-tabs, .view-tabs { display: none !important; }
+/* Barra inferior algo más baja/compacta, respetando el área segura del iPhone. */
+.bottom-nav {
+  padding-top: 3px !important;
+  padding-bottom: calc(3px + env(safe-area-inset-bottom)) !important;
+  gap: 2px !important;
+}
+.bottom-nav button { padding-top: 4px !important; padding-bottom: 2px !important; gap: 2px !important; }
+.bottom-nav button span { font-size: 17px !important; }
+/* GIF a sangre: se recorta el sobrante lateral del 4:3, y el registro recibe el espacio restante. */
+#exerciseList .exercise-card .exercise-log-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, .44fr) minmax(0, .56fr) !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 132px !important;
+  min-height: 132px !important;
+  max-height: 132px !important;
+  aspect-ratio: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 11px !important;
+  background: #111217 !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder .exercise-animation {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .single-entry {
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 9px 8px !important;
+  overflow: hidden !important;
+  justify-content: center !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .8fr) minmax(0, .7fr) !important;
+  gap: 4px !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields label,
+#exerciseList .exercise-card .exercise-log-row .entry-fields input { min-width: 0 !important; width: 100% !important; }
+#exerciseList .exercise-card .exercise-log-row .entry-fields label > span { font-size: 10px !important; white-space: nowrap !important; }
+#exerciseList .exercise-card .exercise-log-row .entry-fields input { height: 42px !important; padding: 0 3px !important; font-size: 13px !important; text-align: center !important; }
+/* Historial y estadísticas: separación clara y menos densidad visual. */
+.section-head { display: flex; justify-content: space-between; gap: 12px; margin: 8px 0 16px !important; align-items: center !important; }
+.section-head h2 { margin: 0 !important; font-size: clamp(23px, 5.5vw, 28px) !important; line-height: 1.15 !important; }
+.section-head .eyebrow { margin-bottom: 5px !important; }
+.history-list { display: grid; gap: 10px !important; }
+.history-card { padding: 14px !important; border-radius: 17px !important; }
+.history-head { align-items: center !important; }
+.history-head > div { display: grid; gap: 4px; min-width: 0; }
+.history-head > div b { font-size: 13px; line-height: 1.35; }
+.history-head > strong { flex: 0 0 auto; font-size: 14px; }
+.history-card > p { margin: 7px 0 0 !important; font-size: 11px !important; color: var(--muted) !important; }
+.history-card details { margin-top: 11px; border-top: 1px solid var(--line); padding-top: 9px; }
+.history-card details summary { color: var(--accent); font-size: 11px; cursor: pointer; }
+.history-entries { gap: 8px !important; }
+.history-entries > div { display: grid; gap: 3px; line-height: 1.4; }
+.stats-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+.stat-tile { padding: 12px !important; border-radius: 14px !important; }
+.stat-tile small { font-size: 10px !important; }
+.stat-tile b, .stat-tile strong { display: block; margin-top: 4px; font-size: clamp(17px, 4.5vw, 22px) !important; overflow-wrap: anywhere; }
+#statsView > .card { padding: 15px !important; margin-top: 11px !important; border-radius: 17px !important; }
+#statsView > .card h3 { font-size: 14px !important; margin: 5px 0 8px !important; }
+#statsView > .card .muted { font-size: 11px !important; line-height: 1.45; }
+.chart { margin: 8px 0 15px !important; }
+@media (max-width: 380px) {
+  .topbar { height: 82px !important; padding-left: 14px !important; padding-right: 14px !important; }
+  .brand { font-size: 14px !important; }
+  .brand-mark { width: 39px !important; height: 39px !important; }
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, .42fr) minmax(0, .58fr) !important; gap: 6px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .technique-placeholder { height: 122px !important; min-height: 122px !important; max-height: 122px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .single-entry { padding: 7px 5px !important; }
   #exerciseList .exercise-card .exercise-log-row .entry-fields { gap: 3px !important; }
   #exerciseList .exercise-card .exercise-log-row .entry-fields label > span { font-size: 9px !important; }
   #exerciseList .exercise-card .exercise-log-row .entry-fields input { font-size: 12px !important; }
