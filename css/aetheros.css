@@ -105,4 +105,96 @@ body { width:100%; overflow-x:hidden; }
 @media (min-width:600px) {
  .exercise-log-row { grid-template-columns:100px minmax(0,1fr); }
  .exercise-log-row .technique-placeholder { max-height:138px; }
+
+
+/* AetherOS v2.0.4 — layout definitivo: GIF miniatura junto al registro. */
+.exercise-card .exercise-log-row {
+  display: grid !important;
+  grid-template-columns: 76px minmax(0, 1fr) !important;
+  gap: 10px !important;
+  align-items: stretch !important;
+  width: 100%;
+  min-width: 0;
+  margin: 12px 0 0 !important;
+}
+.exercise-card .exercise-log-row > .technique-placeholder {
+  grid-column: 1;
+  grid-row: 1;
+  width: 76px !important;
+  height: 96px !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: 76px !important;
+  max-height: 96px !important;
+  aspect-ratio: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-self: center;
+  border-radius: 11px;
+  overflow: hidden;
+}
+.exercise-card .exercise-log-row > .technique-placeholder .exercise-animation {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  padding: 2px !important;
+  margin: 0 !important;
+}
+.exercise-card .exercise-log-row > .technique-placeholder .animation-meta { display: none !important; }
+.exercise-card .exercise-log-row > .technique-placeholder:not(:has(.exercise-animation)) {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  font-size: 8px;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+  background: #15161b;
+}
+.exercise-card .exercise-log-row > .technique-placeholder:not(:has(.exercise-animation)) .play-symbol {
+  width: 22px; height: 22px; flex: 0 0 22px; font-size: 10px;
+}
+.exercise-card .exercise-log-row > .single-entry {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  width: 100%;
+  margin: 0 !important;
+  padding: 9px 8px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.exercise-card .exercise-log-row .entry-label { margin: 0 0 7px !important; }
+.exercise-card .exercise-log-row .entry-label b { font-size: 11px; }
+.exercise-card .exercise-log-row .entry-fields {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .8fr) minmax(0, .65fr) !important;
+  gap: 5px !important;
+  min-width: 0;
+}
+.exercise-card .exercise-log-row .entry-fields label { min-width: 0; }
+.exercise-card .exercise-log-row .entry-fields label > span {
+  font-size: 9px !important;
+  margin: 0 0 4px 1px !important;
+  white-space: nowrap;
+}
+.exercise-card .exercise-log-row .entry-fields input {
+  width: 100%; min-width: 0; height: 39px !important;
+  padding: 0 4px !important; font-size: 13px !important;
+  text-align: center; border-radius: 9px;
+}
+.exercise-card .exercise-log-row .entry-fields label:first-child input { text-align: center; }
+@media (max-width: 360px) {
+  .exercise-card .exercise-log-row { grid-template-columns: 64px minmax(0, 1fr) !important; gap: 7px !important; }
+  .exercise-card .exercise-log-row > .technique-placeholder { width: 64px !important; max-width: 64px !important; height: 88px !important; max-height: 88px !important; }
+  .exercise-card .exercise-log-row > .single-entry { padding: 7px 5px !important; }
+  .exercise-card .exercise-log-row .entry-fields { gap: 3px !important; }
+  .exercise-card .exercise-log-row .entry-fields input { font-size: 12px !important; padding: 0 2px !important; }
 }
