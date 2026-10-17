@@ -525,7 +525,7 @@ html, body { overflow-x: clip !important; }
 }
 
 
-/* AetherOS v2.2.1 — cabecera, temporizador persistente, animaciones y navegación refinados. */
+/* AetherOS v2.2.2 — corrección de caché y refinamiento de interfaz. */
 /* Evita que overflow-x cree un contenedor de scroll que anule position: sticky. */
 html, body { overflow-x: clip !important; }
 .topbar { height: 92px !important; padding-left: 20px !important; padding-right: 20px !important; }
