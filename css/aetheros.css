@@ -380,13 +380,71 @@ body { width:100%; overflow-x:hidden; }
   #exerciseList .exercise-card .exercise-log-row .entry-fields input { font-size: 12px !important; }
 }
 
-/* AetherOS v2.0.9: temporizador fijo durante el desplazamiento y navegación compacta */
-.timer-bar{position:sticky;top:8px;z-index:15;box-shadow:0 8px 24px rgba(0,0,0,.22);backdrop-filter:blur(14px);background:rgba(23,24,29,.96);justify-content:space-between}
-.timer-label{font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-.timer-bar strong{margin-left:auto;min-width:4.2ch;text-align:center;font-size:20px;font-weight:750;letter-spacing:.04em}
-.timer-bar .small-button{min-width:78px}
-.bottom-nav{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:7px 12px calc(7px + env(safe-area-inset-bottom));border-top:1px solid rgba(160,170,220,.16);box-shadow:0 -8px 28px rgba(0,0,0,.24)}
-.bottom-nav button{border-radius:13px;padding:8px 4px 6px;font-size:11px;font-weight:600;transition:background .18s,color .18s}
-.bottom-nav button span{font-size:19px}
-.bottom-nav button.active{background:linear-gradient(180deg,rgba(115,132,202,.22),rgba(115,132,202,.09));box-shadow:inset 0 0 0 1px rgba(150,165,230,.14);color:#dce2ff}
-.shell{padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+/* AetherOS 2.1.0 — correcciones funcionales de descanso y navegación */
+.timer-bar {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 6px);
+  z-index: 18;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  margin: 12px 0 15px;
+  padding: 10px 12px;
+  border: 1px solid #343743;
+  border-radius: 16px;
+  background: rgba(24, 25, 31, .97);
+  box-shadow: 0 8px 24px rgba(0,0,0,.22);
+  backdrop-filter: blur(14px);
+}
+.timer-title { color: var(--muted); font-size: 12px; font-weight: 600; }
+.timer-bar strong { margin: 0; font-size: 20px; letter-spacing: .04em; }
+.timer-bar .small-button { min-width: 76px; min-height: 38px; padding: 8px 12px; }
+#timerReset { min-width: 38px; width: 38px; padding: 0; font-size: 19px; }
+.bottom-nav {
+  position: fixed;
+  z-index: 30;
+  left: 50%; right: auto;
+  bottom: max(8px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(430px, calc(100% - 28px));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  padding: 7px;
+  border: 1px solid #343743;
+  border-radius: 20px;
+  background: rgba(23, 24, 30, .96);
+  box-shadow: 0 10px 35px rgba(0,0,0,.38);
+  backdrop-filter: blur(18px);
+}
+.bottom-nav button {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 7px 4px;
+  border: 1px solid transparent;
+  border-radius: 14px;
+  background: transparent;
+  color: #9b9daa;
+  font-size: 11px;
+  font-weight: 550;
+}
+.bottom-nav button span { font-size: 18px; line-height: 1; }
+.bottom-nav button small { font-size: 11px; line-height: 1.2; }
+.bottom-nav button.active {
+  color: #dce2ff;
+  background: linear-gradient(180deg, #30364b, #252938);
+  border-color: #454d6c;
+  box-shadow: inset 0 1px rgba(255,255,255,.05);
+}
+.shell { padding-bottom: calc(112px + env(safe-area-inset-bottom)); }
+@media (max-width: 380px) {
+  .timer-bar { gap: 7px; padding: 9px; }
+  .timer-bar strong { font-size: 18px; }
+  .timer-bar .small-button { min-width: 68px; }
+  #timerReset { min-width: 34px; width: 34px; }
+  .bottom-nav { width: calc(100% - 22px); }
+}
