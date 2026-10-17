@@ -523,3 +523,141 @@ html, body { overflow-x: clip !important; }
   #exerciseList .exercise-card .exercise-log-row .entry-fields label > span { font-size: 9px !important; }
   #exerciseList .exercise-card .exercise-log-row .entry-fields input { font-size: 12px !important; padding: 0 3px !important; }
 }
+
+
+/* AetherOS v2.2.1 — cabecera, temporizador persistente, animaciones y navegación refinados. */
+/* Evita que overflow-x cree un contenedor de scroll que anule position: sticky. */
+html, body { overflow-x: clip !important; }
+.topbar { height: 92px !important; padding-left: 20px !important; padding-right: 20px !important; }
+.brand { gap: 14px !important; font-size: 17px !important; letter-spacing: 1.8px !important; }
+.brand-mark { width: 48px !important; height: 48px !important; border-radius: 15px !important; font-size: 27px !important; }
+.brand small { font-size: 10px !important; letter-spacing: 2.7px !important; margin-top: 5px !important; }
+.brand-word { line-height: 1.2 !important; }
+
+/* El temporizador permanece a la vista al recorrer la lista de ejercicios. */
+.timer-bar {
+  position: sticky !important;
+  top: calc(env(safe-area-inset-top, 0px) + 8px) !important;
+  z-index: 25 !important;
+  margin-top: 0 !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .28) !important;
+  backdrop-filter: blur(14px);
+}
+
+/* GIFs 4:3 sin bandas de letterboxing; el panel de registro gana anchura. */
+#exerciseList .exercise-card .exercise-log-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, .68fr) minmax(0, 1.32fr) !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder {
+  position: relative !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  aspect-ratio: 4 / 3 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 1px solid #343640 !important;
+  border-radius: 12px !important;
+  background: #191a1f !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder .exercise-animation {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder .animation-meta {
+  padding: 16px 6px 5px !important;
+  font-size: 9px !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .single-entry {
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 10px 10px !important;
+  overflow: visible !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, .82fr) minmax(0, .68fr) !important;
+  gap: 6px !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields label > span {
+  font-size: 10px !important;
+  line-height: 1.25 !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields input {
+  min-width: 0 !important;
+  width: 100% !important;
+  height: 43px !important;
+  padding: 0 5px !important;
+  font-size: 14px !important;
+}
+
+/* Navegación inferior centrada por márgenes, sin desplazamientos por transform. */
+.bottom-nav {
+  left: 0 !important;
+  right: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  transform: none !important;
+  width: min(430px, calc(100% - 28px)) !important;
+  box-sizing: border-box !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-items: stretch !important;
+  gap: 6px !important;
+  padding: 6px 7px calc(6px + env(safe-area-inset-bottom)) !important;
+  border: 1px solid #343743 !important;
+  border-radius: 18px !important;
+  bottom: max(8px, env(safe-area-inset-bottom)) !important;
+}
+.bottom-nav button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 48px !important;
+  margin: 0 !important;
+  padding: 6px 3px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  border-radius: 12px !important;
+  line-height: 1.1 !important;
+}
+.bottom-nav button span { font-size: 19px !important; line-height: 1 !important; }
+.bottom-nav button small { font-size: 10px !important; line-height: 1.2 !important; white-space: nowrap !important; }
+.shell { padding-bottom: calc(112px + env(safe-area-inset-bottom)) !important; }
+
+@media (min-width: 600px) {
+  .topbar { height: 96px !important; }
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr) !important; }
+}
+@media (max-width: 380px) {
+  .topbar { height: 84px !important; padding-left: 14px !important; padding-right: 14px !important; }
+  .brand { gap: 10px !important; font-size: 15px !important; letter-spacing: 1.4px !important; }
+  .brand-mark { width: 42px !important; height: 42px !important; font-size: 24px !important; }
+  .brand small { font-size: 8px !important; letter-spacing: 2px !important; }
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, .62fr) minmax(0, 1.38fr) !important; gap: 7px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .single-entry { padding: 8px 7px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields { gap: 4px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields label > span { font-size: 9px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields input { height: 40px !important; padding: 0 3px !important; font-size: 12px !important; }
+  .bottom-nav { width: calc(100% - 24px) !important; gap: 4px !important; }
+}
