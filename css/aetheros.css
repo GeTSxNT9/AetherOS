@@ -448,3 +448,25 @@ body { width:100%; overflow-x:hidden; }
   #timerReset { min-width: 34px; width: 34px; }
   .bottom-nav { width: calc(100% - 22px); }
 }
+
+
+/* Ajuste integrado: conserva cabecera grande, registro 50/50 y navegación compacta. */
+@media (max-width: 599px) {
+  .topbar { height: 78px !important; }
+  .brand { gap: 12px !important; font-size: 15px !important; letter-spacing: 1.6px !important; }
+  .brand-mark { width: 42px !important; height: 42px !important; border-radius: 13px !important; font-size: 24px !important; }
+  .brand small { font-size: 9px !important; letter-spacing: 2.5px !important; margin-top: 4px !important; }
+  .bottom-nav { min-height: 0 !important; padding: 4px 7px calc(4px + env(safe-area-inset-bottom)) !important; gap: 5px !important; border-radius: 17px !important; }
+  .bottom-nav button { min-height: 43px !important; padding: 4px 3px !important; gap: 2px !important; border-radius: 12px !important; font-size: 10px !important; }
+  .bottom-nav button span { font-size: 17px !important; }
+  .bottom-nav button small { font-size: 10px !important; }
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; gap: 7px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .technique-placeholder { width: 100% !important; max-width: none !important; aspect-ratio: 1 / 1 !important; height: auto !important; min-height: 0 !important; max-height: none !important; overflow: hidden !important; }
+  #exerciseList .exercise-card .exercise-log-row > .technique-placeholder .exercise-animation { object-fit: cover !important; object-position: center !important; padding: 0 !important; }
+  #exerciseList .exercise-card .exercise-log-row > .single-entry { min-width: 0 !important; padding: 8px 7px !important; }
+}
+@media (max-width: 380px) {
+  .bottom-nav { width: calc(100% - 22px) !important; }
+  .bottom-nav button { min-height: 41px !important; }
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important; }
+}
