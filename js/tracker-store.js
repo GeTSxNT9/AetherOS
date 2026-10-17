@@ -49,11 +49,6 @@
    const out=[];for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PREFIX+'session_')){try{const v=JSON.parse(localStorage.getItem(k));if(v&&v.date&&v.entries)out.push(v)}catch{}}}
    return out.sort((a,b)=>`${b.date}${b.day}`.localeCompare(`${a.date}${a.day}`));
  }
- function saveMetric(type,value,date=(()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`})()){
-   if(!['weight','waist'].includes(type))throw Error('Medida no válida');const n=Number(value);if(!Number.isFinite(n)||n<=0)throw Error('Valor no válido');
-   const list=read('bodyMetrics',[]);if(!date||!/^\d{4}-\d{2}-\d{2}$/.test(date))throw Error('Fecha no válida');list.push({type,value:n,date,createdAt:new Date().toISOString()});write('bodyMetrics',list);return list;
- }
- function getMetrics(){return read('bodyMetrics',[])}
  function exportAll(){
    const out={format:'aetheros-backup-v2',exportedAt:new Date().toISOString(),data:{}};
    for(let i=0;i<localStorage.length;i++){
@@ -73,5 +68,5 @@
    staged.forEach(([k,v])=>localStorage.setItem(k,v));
    return staged.length;
  }
- window.AetherStore={getExercise,saveExercise,isDone,setDone,getVariant,setVariant,getSessionDate:()=>read('sessionDate',''),setSessionDate:v=>write('sessionDate',v),saveSession,listSessions,saveMetric,getMetrics,exportAll,importAll};
+ window.AetherStore={getExercise,saveExercise,isDone,setDone,getVariant,setVariant,getSessionDate:()=>read('sessionDate',''),setSessionDate:v=>write('sessionDate',v),saveSession,listSessions,exportAll,importAll};
 })();
