@@ -4,17 +4,17 @@ Aplicación web personal de entrenamiento, pensada para móvil y con funcionamie
 
 ## Funciones
 - Rutina de cinco días con variantes por ejercicio.
-- Registro compacto por ejercicio de carga, repeticiones por serie y RIR por serie.
-- Sugerencias orientativas de doble progresión cuando se cumplen las repeticiones objetivo y el RIR.
-- Historial de sesiones por fecha y estadísticas de volumen, repeticiones, cargas, frecuencia, peso y cintura.
+- Registro de carga, repeticiones y RIR; admite un valor común o valores separados por serie mediante punto y coma.
+- Sugerencias orientativas de doble progresión basadas en las series registradas.
+- Historial y estadísticas de volumen, repeticiones, cargas y frecuencia.
 - Temporizador de descanso, exportación e importación de copias de seguridad.
-- Icono de AetherOS y diseño adaptable a móvil.
+- Icono, diseño adaptable, caché offline y carga de animaciones de ejercicios.
 
 ## Publicación
 Sube los archivos conservando sus rutas y activa GitHub Pages desde la rama y carpeta que uses. No borres el almacenamiento local del navegador si quieres conservar registros anteriores.
 
-## Compatibilidad de datos
-La app mantiene lectura/exportación de las claves antiguas `alpha_track_v2_` y `alpha_v4_` para preservar registros existentes. Los nuevos datos se guardan con el prefijo `aetheros_v1_`.
+## Datos y copias de seguridad
+Los registros nuevos se guardan en el espacio local `aetheros_v2_`. La aplicación no sincroniza automáticamente los datos entre dispositivos. Exporta periódicamente una copia JSON y guárdala en un lugar seguro. La importación combina los registros compatibles con los datos locales existentes.
 
-## Animaciones
-Las animaciones se resuelven por listas explícitas de nombres del catálogo de ejercicios; si no existe una coincidencia exacta no se presenta una animación aleatoria. Los GIF de Gym visual se cargan desde el catálogo remoto y se cachean cuando el navegador lo permite. El crédito de los medios se mantiene en Opciones para no ocupar espacio en las tarjetas de ejercicios.
+## Animaciones y atribución
+Las animaciones se resuelven por listas explícitas de nombres del catálogo [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset). Si no hay una coincidencia exacta, la app muestra un aviso en lugar de una animación potencialmente incorrecta. Los GIF y miniaturas se atribuyen a Gym visual; consulta el archivo `LICENSE` y `NOTICE.md` del repositorio de origen para las condiciones aplicables a los medios. Los datos y el código del repositorio de origen indican licencia MIT, pero los medios tienen términos de uso separados.
