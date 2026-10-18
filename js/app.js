@@ -22,7 +22,7 @@ function init(){
  $('exportBtn').addEventListener('click',exportData);$('exportSettings').addEventListener('click',exportData);$('importInput').addEventListener('change',importData);
  $('refreshHistory').addEventListener('click',renderHistory);
  $('exerciseStatFilter').addEventListener('change',renderStats);
- if('serviceWorker'in navigator&&location.protocol!=='file:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+ if('serviceWorker'in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('./sw.js?v=2.4.0',{updateViaCache:'none'}).then(reg=>reg.update()).catch(()=>{});}
  if(window.AetherAnimations)window.AetherAnimations.prefetchRoutine().catch(()=>{});
 }
 function wireNavigation(){document.querySelectorAll('[data-view]').forEach(btn=>btn.addEventListener('click',()=>showView(btn.dataset.view)))}
