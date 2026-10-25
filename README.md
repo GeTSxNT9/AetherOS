@@ -18,3 +18,8 @@ Los registros nuevos se guardan en el espacio local `aetheros_v2_`. La aplicaci�
 
 ## Animaciones y atribución
 Las animaciones se resuelven por listas explícitas de nombres del catálogo [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset). Si no hay una coincidencia exacta, la app muestra un aviso en lugar de una animación potencialmente incorrecta. Los GIF y miniaturas se atribuyen a Gym visual; consulta el archivo `LICENSE` y `NOTICE.md` del repositorio de origen para las condiciones aplicables a los medios. Los datos y el código del repositorio de origen indican licencia MIT, pero los medios tienen términos de uso separados.
+
+
+### v2.5.1
+- Barra inferior fijada al borde inferior de la pantalla, sin margen exterior. El área segura de iOS queda integrada en el fondo de la barra.
+- Temporizador ajustado para permanecer encima de la barra inferior.
