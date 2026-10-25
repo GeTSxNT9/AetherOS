@@ -922,18 +922,23 @@ html, body { overflow-x: clip !important; }
 }
 
 
-/* AetherOS 2.5.1 — barra de navegación pegada al borde inferior. */
+/* AetherOS 2.5.2 — reduce el espacio interno inferior y acerca el temporizador a la navegación. */
 .bottom-nav {
   position: fixed !important;
   bottom: 0 !important;
-  padding-bottom: calc(7px + env(safe-area-inset-bottom, 0px)) !important;
+  padding-bottom: env(safe-area-inset-bottom, 0px) !important;
   border-radius: 20px 20px 0 0 !important;
   /* Mantiene el área segura del iPhone dentro de la propia barra, sin hueco exterior. */
   background: rgba(23, 24, 30, .98) !important;
 }
 #restTimer {
-  bottom: calc(96px + env(safe-area-inset-bottom, 0px)) !important;
+  bottom: calc(68px + env(safe-area-inset-bottom, 0px)) !important;
 }
 @media (min-width: 600px) {
   .bottom-nav { border-radius: 20px 20px 0 0 !important; }
 }
+
+/* Barra más compacta: solo reserva el área segura real del iPhone. */
+.bottom-nav { gap: 4px !important; }
+.bottom-nav button { min-height: 46px !important; padding-top: 4px !important; padding-bottom: 4px !important; gap: 3px !important; }
+.shell { padding-bottom: calc(125px + env(safe-area-inset-bottom, 0px)) !important; }
