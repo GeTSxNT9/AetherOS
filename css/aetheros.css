@@ -838,3 +838,34 @@ html, body { overflow-x: clip !important; }
   .topbar { height: 98px !important; }
   #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr) !important; }
 }
+
+
+/* Ajustes solicitados: proporción 40/60, navegación minimalista y temporizador inferior. */
+#exerciseList .exercise-card .exercise-log-row {
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) !important;
+}
+@media (max-width: 599px) {
+  #exerciseList .exercise-card .exercise-log-row {
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) !important;
+  }
+}
+@media (min-width: 600px) {
+  #exerciseList .exercise-card .exercise-log-row {
+    grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr) !important;
+  }
+}
+#restTimer {
+  position: fixed !important;
+  top: auto !important;
+  bottom: calc(82px + env(safe-area-inset-bottom)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(440px, calc(100% - 28px)) !important;
+  margin: 0 !important;
+  z-index: 60 !important;
+  box-sizing: border-box !important;
+}
+.bottom-nav button span {
+  font-size: 19px !important;
+  font-weight: 400 !important;
+}
