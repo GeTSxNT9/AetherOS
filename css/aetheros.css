@@ -869,3 +869,54 @@ html, body { overflow-x: clip !important; }
   font-size: 19px !important;
   font-weight: 400 !important;
 }
+
+
+/* AetherOS 2.5.0 — correcciones definitivas de interfaz. */
+#exerciseList .exercise-card .exercise-log-row {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) !important;
+  gap: 10px !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .technique-placeholder {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 160px !important;
+  min-height: 160px !important;
+  max-height: 160px !important;
+  aspect-ratio: auto !important;
+}
+#exerciseList .exercise-card .exercise-log-row > .single-entry {
+  min-width: 0 !important;
+  padding: 10px !important;
+}
+#exerciseList .exercise-card .exercise-log-row .entry-fields { gap: 5px !important; }
+#exerciseList .exercise-card .exercise-log-row .entry-fields input { padding-inline: 5px !important; }
+#restTimer {
+  position: fixed !important;
+  top: auto !important;
+  bottom: calc(78px + env(safe-area-inset-bottom, 0px)) !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: min(440px, calc(100% - 28px)) !important;
+  margin: 0 !important;
+  z-index: 30 !important;
+  box-sizing: border-box !important;
+}
+.bottom-nav .nav-icon {
+  width: 21px !important;
+  height: 21px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 0 !important;
+  line-height: 1 !important;
+}
+.bottom-nav .nav-icon svg { display: block; width: 21px; height: 21px; }
+.shell { padding-bottom: calc(150px + env(safe-area-inset-bottom)) !important; }
+@media (max-width: 380px) {
+  #exerciseList .exercise-card .exercise-log-row { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr) !important; gap: 7px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .technique-placeholder { height: 150px !important; min-height: 150px !important; max-height: 150px !important; }
+  #exerciseList .exercise-card .exercise-log-row > .single-entry { padding: 8px 6px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields { gap: 3px !important; }
+  #exerciseList .exercise-card .exercise-log-row .entry-fields input { padding-inline: 3px !important; font-size: 12px !important; }
+}
