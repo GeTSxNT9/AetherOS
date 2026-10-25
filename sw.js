@@ -1,4 +1,4 @@
-const CACHE='aetheros-v2.4.1-ui-repair';
+const CACHE='aetheros-v2.5.0-ui-fixes';
 const MEDIA_CACHE='aetheros-gymvisual-v1';
 const CORE=['./','./index.html','./manifest.json','./css/aetheros.css','./icons/aetheros-192.png','./icons/aetheros-512.png','./js/routine-data.js','./js/tracker-store.js','./js/exercise-animations.js','./js/app.js'];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)));self.skipWaiting()});
