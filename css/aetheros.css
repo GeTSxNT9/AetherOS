@@ -942,3 +942,46 @@ html, body { overflow-x: clip !important; }
 .bottom-nav { gap: 4px !important; }
 .bottom-nav button { min-height: 46px !important; padding-top: 4px !important; padding-bottom: 4px !important; gap: 3px !important; }
 .shell { padding-bottom: calc(125px + env(safe-area-inset-bottom, 0px)) !important; }
+
+/* AetherOS 2.5.3 — compactación real de la zona inferior en iPhone.
+   Evita que reglas antiguas añadan una segunda capa de padding/altura. */
+.bottom-nav {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 0 !important;
+  transform: translateX(-50%) !important;
+  width: min(440px, calc(100% - 28px)) !important;
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: none !important;
+  box-sizing: border-box !important;
+  padding: 5px 7px calc(max(8px, env(safe-area-inset-bottom, 0px) - 12px)) !important;
+  margin: 0 !important;
+  gap: 4px !important;
+  border-radius: 18px 18px 0 0 !important;
+  align-items: stretch !important;
+}
+.bottom-nav button {
+  height: auto !important;
+  min-height: 44px !important;
+  max-height: 50px !important;
+  padding: 4px 2px !important;
+  margin: 0 !important;
+  gap: 3px !important;
+  justify-content: center !important;
+}
+.bottom-nav button .nav-icon,
+.bottom-nav button .nav-icon svg {
+  width: 20px !important;
+  height: 20px !important;
+}
+#restTimer {
+  bottom: calc(56px + max(8px, env(safe-area-inset-bottom, 0px) - 12px)) !important;
+}
+.shell {
+  padding-bottom: calc(105px + env(safe-area-inset-bottom, 0px)) !important;
+}
+@media (min-width: 600px) {
+  .bottom-nav { border-radius: 18px 18px 0 0 !important; }
+}
