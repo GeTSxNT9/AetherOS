@@ -977,3 +977,46 @@ html, body { overflow-x: clip !important; }
   padding-bottom: max(4px, env(safe-area-inset-bottom, 0px)) !important;
   box-sizing: border-box !important;
 }
+
+
+/* AetherOS 2.5.7 — iPhone: extend nav to the physical bottom and dock rest timer just above it.
+   The negative safe-area offset extends the panel background into the iOS bottom inset;
+   matching internal padding preserves the button row's touch area. */
+.bottom-nav {
+  position: fixed !important;
+  left: 8px !important;
+  right: 8px !important;
+  bottom: calc(-1 * env(safe-area-inset-bottom, 0px)) !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  box-sizing: border-box !important;
+  padding: 4px 7px calc(env(safe-area-inset-bottom, 0px) + 4px) !important;
+  min-height: 0 !important;
+  gap: 4px !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+  z-index: 100 !important;
+}
+.bottom-nav button {
+  height: 42px !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 4px 3px !important;
+  gap: 2px !important;
+}
+/* Keep the timer only a small, consistent gap above the nav; don't add safe-area twice. */
+#restTimer {
+  position: fixed !important;
+  top: auto !important;
+  bottom: 54px !important;
+  left: 8px !important;
+  right: 8px !important;
+  width: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  transform: none !important;
+  z-index: 99 !important;
+}
+.shell { padding-bottom: calc(150px + env(safe-area-inset-bottom, 0px)) !important; }
