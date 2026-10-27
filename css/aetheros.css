@@ -28,7 +28,7 @@
 
   /* Dock inferior: medidas compartidas por la barra, el temporizador y el scroll */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --dock-bottom: max(14px, calc(var(--safe-bottom) + 6px));
+  --dock-bottom: max(8px, calc(var(--safe-bottom) - 14px));
   --nav-height: 64px;
   --dock-width: min(420px, calc(100% - 28px));
   --dock-top: calc(var(--dock-bottom) + var(--nav-height));
@@ -212,7 +212,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   isolation: isolate;
   width: 100%;
   min-width: 0;
-  height: 160px;
+  height: 128px;
   margin: 0;
   padding: 0;
   display: flex;
@@ -427,7 +427,9 @@ body::after {
   background: linear-gradient(180deg, rgba(135, 154, 255, .24), rgba(135, 154, 255, .10));
   box-shadow: inset 0 0 0 1px rgba(184, 197, 255, .20);
 }
-.bottom-nav button.active .nav-icon svg { transform: translateY(-1px); stroke-width: 2; }
+.bottom-nav .nav-icon svg { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.bottom-nav .nav-icon .tone { fill: currentColor; fill-opacity: 0; stroke: none; transition: fill-opacity .2s ease; }
+.bottom-nav button.active .nav-icon .tone { fill-opacity: .28; }
 
 /* Temporizador: flota justo encima del dock, con el mismo ancho que la barra */
 .timer-bar {
@@ -481,7 +483,7 @@ body::after {
   .brand small { font-size: 7px; letter-spacing: 1.9px; }
   .card-top { gap: 8px; }
   .exercise-log-row { gap: 7px; }
-  .technique-placeholder { height: 150px; }
+  .technique-placeholder { height: 120px; }
   .single-entry { padding: 8px 6px; }
   .entry-fields { gap: 3px; }
   .entry-fields label > span { font-size: 9px; }
