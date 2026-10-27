@@ -61,9 +61,11 @@
     saveSession(day);
   }
 
-  const isDone = (day, id) => !!read(`done_${day}_${id}`, false);
+  // La marca de "hecho" guarda la fecha en que se marcó: al cambiar de día deja de contar
+  // y los ejercicios vuelven a aparecer sin marcar (los pesos y repeticiones se conservan).
+  const isDone = (day, id) => read(`done_${day}_${id}`, false) === todayKey();
   function setDone(day, id, value) {
-    write(`done_${day}_${id}`, !!value);
+    write(`done_${day}_${id}`, value ? todayKey() : false);
     saveSession(day);
   }
 
