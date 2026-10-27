@@ -27,5 +27,9 @@ Las animaciones se resuelven por listas explícitas de nombres del catálogo [ha
 - La sugerencia de doble progresión ya contempla "última serie RIR 1".
 - Service worker: la versión de caché se cambia en una sola constante (`CACHE_VERSION` en `sw.js`).
 
+## Versión 2.6.1
+- Las marcas de ejercicio hecho se reinician cada día (los pesos y repeticiones se conservan).
+- Dock inferior con la mitad de separación, iconos nuevos y cuadros de animación/registro menos altos.
+
 ## Cómo publicar una actualización
 Sube los archivos modificados conservando sus rutas. Si cambias cualquier archivo de la app, sube también `CACHE_VERSION` en `sw.js` para que los móviles descarguen la versión nueva. Tras publicar, abre la app dos veces (la primera instala la actualización, la segunda la muestra).
