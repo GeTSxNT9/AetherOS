@@ -31,5 +31,9 @@ Las animaciones se resuelven por listas explícitas de nombres del catálogo [ha
 - Las marcas de ejercicio hecho se reinician cada día (los pesos y repeticiones se conservan).
 - Dock inferior con la mitad de separación, iconos nuevos y cuadros de animación/registro menos altos.
 
+## Versión 2.7.0
+- Rutina actualizada según «Rutina de Entrenamiento Semanal» (30 ejercicios, 67 alternativas, ejecución y consejo de cada uno).
+- Catálogo de animaciones revisado ejercicio por ejercicio; en Opciones hay un botón «Comprobar animaciones» que lista los que no tienen GIF.
+
 ## Cómo publicar una actualización
 Sube los archivos modificados conservando sus rutas. Si cambias cualquier archivo de la app, sube también `CACHE_VERSION` en `sw.js` para que los móviles descarguen la versión nueva. Tras publicar, abre la app dos veces (la primera instala la actualización, la segunda la muestra).
