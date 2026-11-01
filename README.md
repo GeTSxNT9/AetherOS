@@ -47,5 +47,9 @@ Las animaciones se resuelven por listas explícitas de nombres del catálogo [ha
 - Opciones: botón para descargar la lista de ejercicios del dataset.
 - Pestaña «Técnica» sin la explicación del RIR.
 
+## Versión 2.9.0
+- Animaciones revisadas contra el listado real del dataset (1323 ejercicios).
+- Si un ejercicio tiene varias animaciones posibles, un botón ↻ sobre el GIF permite cambiar de una a otra y la app recuerda la elección.
+
 ## Cómo publicar una actualización
 Sube los archivos modificados conservando sus rutas. Si cambias cualquier archivo de la app, sube también `CACHE_VERSION` en `sw.js` para que los móviles descarguen la versión nueva. Tras publicar, abre la app dos veces (la primera instala la actualización, la segunda la muestra).
