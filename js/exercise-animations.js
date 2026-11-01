@@ -31,7 +31,7 @@
     "Press de pecho en máquina": ['lever chest press', 'lever stack seated chest press male', 'lever chest press plate loaded', 'lever chest press version 2'],
     "Press de banca con barra": ['barbell bench press', 'barbell bench press medium grip'],
     "Press de banca con mancuernas": ['dumbbell bench press'],
-    "Press militar en máquina": ['lever military press plate loaded', 'lever shoulder press plate loaded version 3', 'lever shoulder press', 'lever shoulder press plate loaded', 'lever seated shoulder press'],
+    "Press militar en máquina": ['lever shoulder press', 'lever seated shoulder press', 'lever shoulder press plate loaded', 'lever shoulder press plate loaded version 3'],
     "Press militar con mancuernas": ['dumbbell seated shoulder press', 'seated dumbbell shoulder press', 'seated dumbbell press'],
     "Aperturas en máquina Peck Deck": ['lever pec deck fly', 'pec deck fly', 'lever pec deck fly machine', 'lever seated fly'],
     "Aperturas en poleas": ['cable crossover variation', 'cable crossover', 'cable chest fly', 'cable standing fly'],
@@ -39,19 +39,15 @@
     "Elevaciones laterales con mancuernas": ['dumbbell lateral raise', 'lateral raise'],
     "Elevaciones laterales en polea": ['cable lateral raise', 'cable one arm lateral raise'],
     "Elevaciones laterales en máquina": ['lever lateral raise', 'lever seated lateral raise'],
-    "Extensión de tríceps en polea alta": ['cable triceps pushdown', 'triceps pushdown', 'cable pushdown'],
     "Press francés tumbado con mancuernas": ['dumbbell lying triceps extension', 'lying dumbbell triceps extension'],
     "Press francés con mancuernas": ['dumbbell lying triceps extension', 'lying dumbbell triceps extension'],
     "Press francés con barra EZ": ['ez barbell lying triceps extension', 'ez barbell decline triceps extension', 'ez barbell skull crusher', 'barbell lying triceps extension skull crusher', 'ez bar lying triceps extension', 'ez bar skullcrusher', 'ez bar skull crusher'],
     "Extensión de tríceps por encima de la cabeza con mancuerna": ['dumbbell standing triceps extension', 'dumbbell seated triceps extension', 'dumbbell overhead triceps extension', 'standing dumbbell triceps extension'],
     "Extensión de tríceps por encima de la cabeza en polea": ['cable overhead triceps extension rope attachment', 'cable standing overhead triceps extension', 'cable seated overhead triceps extension', 'cable overhead triceps extension', 'triceps overhead extension with rope', 'cable rope overhead triceps extension'],
-    "Jalón al pecho con agarre estrecho": ['cable close grip front lat pulldown', 'cable close grip front lat pulldown female', 'lat pulldown close grip', 'close grip front lat pulldown', 'close grip lat pulldown', 'cable close grip lat pulldown', 'lever close grip lat pulldown', 'cable pulldown', 'lat pulldown', 'cable lat pulldown', 'reverse grip machine lat pulldown'],
     "Jalón al pecho con agarre ancho": ['wide grip lat pulldown', 'cable lat pulldown', 'lat pulldown', 'cable pulldown'],
-    "Dominadas asistidas con agarre cerrado": ['assisted pull up', 'band assisted pull up'],
-    "Dominadas asistidas con agarre ancho": ['assisted pull up', 'band assisted pull up'],
     "Dominadas con peso corporal": ['pull up', 'pullups'],
-    "Remo unilateral en máquina": ['lever one arm seated row seated row machine', 'lever one arm low row plate loaded', 'lever one arm bent over row plate loaded', 'one arm machine row', 'lever seated single arm row', 'lever one arm lateral high row', 'lever seated row'],
-    "Remo unilateral en máquina con apoyo pectoral": ['lever one arm bent over row', 'lever one arm lateral high row', 'lever bent over single arm neutral grip row with chest support', 'lever bent over single arm wide grip row with chest support', 'lever one arm chest supported row', 'lever chest supported one arm row'],
+    "Remo unilateral en máquina": ['lever one arm seated row seated row machine', 'lever one arm low row plate loaded', 'one arm machine row', 'lever seated row', 'lever narrow grip seated row'],
+    "Remo unilateral en máquina con apoyo pectoral": ['lever bent over row with chest support', 'lever seated row', 'lever chest supported row', 'chest supported row'],
     "Remo con mancuerna a una mano": ['dumbbell one arm row', 'one arm dumbbell row', 'single arm dumbbell row', 'dumbbell one arm bent over row'],
     "Remo sentado en polea baja": ['seated cable row', 'seated cable rows', 'cable seated row'],
     "Remo inclinado con barra": ['barbell bent over row', 'bent over barbell row'],
@@ -60,7 +56,7 @@
     "Remo en máquina con apoyo pectoral": ['lever bent over row with chest support', 'lever seated row', 'lever chest supported row', 'chest supported row'],
     "Aperturas inversas en máquina Peck Deck": ['lever reverse pec deck fly', 'reverse pec deck fly', 'lever reverse fly', 'lever seated reverse fly'],
     "Aperturas posteriores con mancuernas en banco inclinado": ['dumbbell incline reverse fly', 'incline dumbbell reverse fly', 'dumbbell incline rear lateral raise', 'dumbbell incline rear delt fly', 'dumbbell lying rear delt raise'],
-    "Aperturas posteriores con mancuernas de pie e inclinado": ['dumbbell reverse fly', 'reverse dumbbell fly', 'bent over reverse dumbbell fly', 'dumbbell rear delt fly'],
+    "Aperturas posteriores con mancuernas de pie e inclinado": ['dumbbell rear lateral raise', 'dumbbell bent over rear lateral raise', 'dumbbell bent over reverse fly', 'dumbbell rear fly', 'dumbbell rear delt row'],
     "Curl de bíceps con barra recta": ['barbell curl', 'barbell biceps curl', 'standing barbell curl'],
     "Curl alterno con mancuernas": ['alternating dumbbell biceps curl', 'dumbbell biceps curl', 'alternate dumbbell curl', 'alternate biceps curl'],
     "Curl de bíceps con barra EZ": ['ez bar curl', 'ez bar biceps curl', 'ez barbell curl'],
@@ -74,7 +70,7 @@
     "Curl femoral sentado": ['lever seated leg curl', 'seated leg curl', 'seated machine leg curl'],
     "Curl femoral tumbado": ['lever lying leg curl', 'lying leg curl', 'lying leg curls'],
     "Curl femoral de pie": ['lever standing leg curl', 'standing leg curl', 'cable standing leg curl', 'band standing leg curl', 'standing single leg curl'],
-    "Curl femoral deslizante": ['sliding leg curl', 'lying leg curl on floor sliders', 'stability ball hamstring curl', 'swiss ball hamstring curl', 'suspended hamstring curl', 'stability ball leg curl', 'swiss ball leg curl', 'exercise ball leg curl', 'lever lying leg curl'],
+    "Curl femoral deslizante": ['sliding leg curl', 'lying leg curl on floor sliders', 'stability ball hamstring curl', 'swiss ball hamstring curl', 'stability ball leg curl', 'swiss ball leg curl', 'exercise ball leg curl'],
     "Prensa de piernas inclinada": ['sled 45 leg press', 'lever leg press', 'leg press'],
     "Sentadilla búlgara con mancuernas": ['dumbbell bulgarian split squat', 'bulgarian split squat', 'split squat with dumbbells', 'dumbbell single leg split squat', 'dumbbell split squat', 'single leg split squat'],
     "Extensión de cuádriceps en máquina": ['lever leg extension', 'leg extension', 'leg extensions'],
@@ -82,8 +78,6 @@
     "Elevación de talones en máquina": ['lever seated calf raise', 'standing calf raise machine', 'calf raise machine', 'seated calf raise', 'lever standing calf raise'],
     "Elevación de talones en prensa": ['sled calf press on leg press', 'sled 45 calf press', 'calf press on the leg press machine', 'calf press'],
     "Elevación de talones de pie con mancuernas": ['standing dumbbell calf raise', 'dumbbell standing calf raise'],
-    "Encogimientos abdominales en máquina": ['lever crunch', 'ab crunch machine', 'machine crunch', 'lever seated crunch'],
-    "Encogimientos abdominales en el suelo": ['crunch', 'crunches', 'crunch floor'],
     "Press de pecho inclinado en máquina": ['lever incline chest press', 'incline chest press machine', 'lever incline chest press plate loaded'],
     "Press inclinado con mancuernas": ['incline dumbbell press', 'incline dumbbell bench press', 'dumbbell incline bench press', 'dumbbell incline press'],
     "Press inclinado con barra": ['barbell incline bench press', 'incline barbell bench press'],
@@ -95,18 +89,21 @@
     "Elevaciones laterales unilaterales con apoyo": ['one arm dumbbell lateral raise', 'single arm dumbbell lateral raise', 'dumbbell one arm lateral raise', 'dumbbell single arm lateral raise', 'cable one arm lateral raise'],
     "Hip Thrust en máquina": ['lever hip thrust', 'leverage machine hip thrust', 'hip thrust machine', 'machine hip thrust', 'smith machine hip thrust', 'barbell hip thrust', 'barbell glute bridge'],
     "Hip Thrust con barra": ['barbell hip thrust', 'hip thrust', 'barbell glute bridge', 'smith machine hip thrust', 'bench hip thrust'],
-    "Puente de glúteos con mancuerna": ['dumbbell glute bridge', 'weighted glute bridge', 'dumbbell hip thrust', 'barbell glute bridge'],
     "Puente de glúteos con peso corporal": ['glute bridge', 'bodyweight glute bridge', 'bridge', 'low glute bridge on floor'],
     "Peso muerto rumano con barra": ['barbell romanian deadlift', 'romanian deadlift'],
     "Peso muerto rumano con mancuernas": ['dumbbell romanian deadlift', 'romanian deadlift dumbbell'],
-    "Extensión de cadera en polea baja": ['cable kickback', 'cable leg kickback', 'cable standing hip extension', 'cable hip extension', 'cable glute kickback', 'standing cable glute kickback'],
-    "Patada de glúteo con mancuerna": ['dumbbell glute kickback', 'quadruped dumbbell kickback', 'dumbbell donkey kick', 'cable kickback', 'cable leg kickback', 'cable hip extension', 'cable glute kickback'],
+    "Extensión de cadera en polea baja": ['cable standing hip extension', 'cable hip extension', 'cable glute kickback', 'cable standing leg kickback', 'lever hip extension version 2', 'lever hip extension'],
+    "Patada de glúteo con mancuerna": ['dumbbell donkey kick', 'dumbbell glute kickback', 'quadruped dumbbell kickback', 'cable standing hip extension', 'cable hip extension', 'cable glute kickback', 'cable standing leg kickback', 'lever hip extension version 2', 'lever hip extension'],
     "Puente de glúteos unilateral": ['single leg bridge with outstretched leg', 'single leg glute bridge', 'single leg hip thrust', 'single leg bridge'],
     "Zancada hacia atrás con mancuernas": ['dumbbell reverse lunge', 'reverse dumbbell lunge', 'dumbbell rear lunge'],
-    "Curl bayesiano de bíceps en polea a una mano": ['single arm bayesian curl', 'bayesian cable curl', 'standing one arm cable curl behind body', 'cable curl behind the body', 'single arm cable curl behind body', 'cable one arm curl', 'cable curl'],
+    "Curl bayesiano de bíceps en polea a una mano": ['cable bayesian curl', 'single arm bayesian curl', 'cable one arm bayesian curl', 'standing one arm cable curl behind body', 'cable curl behind the body', 'single arm cable curl behind body'],
     "Curl inclinado con mancuernas": ['dumbbell incline biceps curl', 'dumbbell incline curl', 'dumbbell incline alternate bicep curl', 'incline dumbbell curl'],
     "Curl de concentración con mancuerna": ['concentration curl', 'dumbbell concentration curl'],
-    "Remo sentado libre": ['bent over two dumbbell row', 'dumbbell bent over row', 'bent over dumbbell row', 'dumbbell incline row']
+    "Jalón al pecho con agarre cerrado": ['cable pulldown', 'lat pulldown', 'cable lat pulldown', 'reverse grip machine lat pulldown'],
+    "Dominadas asistidas": ['assisted pull up', 'band assisted pull up'],
+    "Crunch abdominal en máquina": ['lever crunch', 'ab crunch machine', 'machine crunch', 'lever seated crunch'],
+    "Crunch abdominal en el suelo": ['crunch floor', 'crunch', 'crunches'],
+    "Extensión unilateral de tríceps en polea alta": ['cable one arm tricep pushdown', 'cable one arm triceps pushdown', 'cable standing one arm triceps pushdown', 'cable pushdown one arm', 'cable triceps pushdown', 'triceps pushdown', 'cable pushdown']
   };
 
   // Clave sin orden: "seated dumbbell curl" y "dumbbell seated curl" son el mismo ejercicio.
@@ -231,6 +228,12 @@
     return scored.slice(0, 3).map(x => x.name);
   }
 
+  // Texto con todos los nombres del dataset (uno por línea), para revisar coincidencias.
+  async function datasetNames() {
+    const items = await getDataset();
+    return items.length ? items.map(entry => entry.name).filter(Boolean).sort().join('\n') : '';
+  }
+
   // ---- Revisión: qué nombres de la rutina no tienen animación en el dataset ----
   async function audit() {
     const items = await getDataset();
@@ -240,5 +243,5 @@
     return { datasetOk: items.length > 0, total: names.length, missing };
   }
 
-  window.AetherAnimations = { hydrate, prefetchRoutine, audit };
+  window.AetherAnimations = { hydrate, prefetchRoutine, audit, datasetNames };
 })();

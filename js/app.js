@@ -170,7 +170,7 @@
   <div class="progression-slot">${progressionMarkup(progression(ex, active, record))}</div>
   <div class="card-actions"><button class="subtle-button alternatives-btn" type="button" aria-expanded="false">⇄ <span>Cambiar variante</span></button><button class="subtle-button note-btn" type="button" aria-expanded="false">ⓘ <span>Técnica</span></button></div>
   <div class="alternatives-panel" hidden><p class="panel-label">ELIGE LA VARIANTE QUE HAS HECHO</p><p class="fineprint">Sustituye al ejercicio principal (no se añade). Mantén sus series y repeticiones y empieza con una carga conservadora.</p>${alternatives}<button class="reset-variant" type="button">Volver al ejercicio principal</button></div>
-  <div class="note-panel" hidden><p><b>Ejecución.</b> ${esc(ex.exec)}</p><p><b>Consejo.</b> ${esc(ex.tip)}</p><p class="fineprint">RIR significa las repeticiones que podrías haber hecho antes del fallo técnico.</p></div>
+  <div class="note-panel" hidden><p><b>Ejecución.</b> ${esc(ex.exec)}</p><p><b>Consejo.</b> ${esc(ex.tip)}</p></div>
 </article>`;
   }
 
@@ -334,6 +334,24 @@
     }
   }
 
+  // Descarga la lista de ejercicios del dataset para poder elegir con exactitud las animaciones.
+  async function downloadDatasetNames() {
+    const out = $('auditResult');
+    out.hidden = false;
+    const text = await window.AetherAnimations.datasetNames();
+    if (!text) {
+      out.textContent = 'No se pudo cargar el catálogo de animaciones. Conecta a internet e inténtalo de nuevo.';
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'aetheros-nombres-dataset.txt';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    out.textContent = 'Lista descargada.';
+  }
+
   // ======================================================================
   // Historial
   // ======================================================================
@@ -468,6 +486,7 @@
     $('exportSettings').addEventListener('click', exportData);
     $('importInput').addEventListener('change', importData);
     $('auditBtn').addEventListener('click', auditAnimations);
+    $('namesBtn').addEventListener('click', downloadDatasetNames);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
 
