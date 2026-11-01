@@ -243,6 +243,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
   object-position: center;
   background: var(--surface);
 }
+.anim-cycle { position: absolute; right: 6px; bottom: 6px; z-index: 2; padding: 4px 8px; border: 0; border-radius: 99px; background: rgba(16, 17, 20, .75); color: var(--text); font-size: 10px; font-variant-numeric: tabular-nums; -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
 .technique-placeholder > small { font-size: 9px; color: var(--muted); }
 .play-symbol { display: grid; place-items: center; flex: 0 0 22px; width: 22px; height: 22px; border-radius: 10px; background: #2b2d38; color: var(--accent); font-size: 10px; }
 
