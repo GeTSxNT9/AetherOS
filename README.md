@@ -39,5 +39,8 @@ Las animaciones se resuelven por listas explícitas de nombres del catálogo [ha
 - Animaciones: la coincidencia ya no depende del orden de las palabras del nombre y hay más nombres alternativos por ejercicio.
 - «Comprobar animaciones» sugiere los nombres parecidos reales del dataset para los ejercicios que sigan sin GIF.
 
+## Versión 2.7.2
+- Catálogo de animaciones ajustado con los nombres reales del dataset para los últimos ejercicios sin GIF.
+
 ## Cómo publicar una actualización
 Sube los archivos modificados conservando sus rutas. Si cambias cualquier archivo de la app, sube también `CACHE_VERSION` en `sw.js` para que los móviles descarguen la versión nueva. Tras publicar, abre la app dos veces (la primera instala la actualización, la segunda la muestra).
