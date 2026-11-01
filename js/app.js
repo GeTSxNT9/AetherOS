@@ -20,6 +20,8 @@
   // ======================================================================
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const norm = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  // "8–12 por lado" → "8–12 reps por lado"; los textos que empiezan por RIR se dejan igual.
+  const repsLabel = reps => /^\d/.test(reps) ? String(reps).replace(/^(\d+(?:\s*[–-]\s*\d+)?)/, '$1 reps') : String(reps);
   const formatKg = value => Math.round(value).toLocaleString('es-ES');
 
   const dateKey = () => {
@@ -113,6 +115,7 @@
   // Doble progresión: si todas las series llegan al máximo del rango con el RIR previsto,
   // se sugiere subir un poco el peso en la siguiente sesión.
   function progression(ex, active, record) {
+    if (/rir/i.test(active.reps)) return null; // series "al RIR" (p. ej. dominadas): sin rango de reps
     const range = String(active.reps).match(/(\d+)\s*[–-]\s*(\d+)/);
     if (!range) return null;
 
@@ -152,12 +155,12 @@
     const field = (label, key) =>
       `<label><span>${label}</span><input inputmode="${key === 'weight' ? 'decimal' : 'text'}" type="text" data-field="${key}" value="${esc(record[key] || '')}"></label>`;
     const alternatives = ex.alternatives.map((alt, i) =>
-      `<button class="alternative-option" type="button" data-alt="${i}"><span><b>${esc(alt[0])}</b><small>${alt[1]} series · ${esc(alt[2])} reps</small></span><span>→</span></button>`).join('');
+      `<button class="alternative-option" type="button" data-alt="${i}"><span><b>${esc(alt[0])}</b><small>${alt[1]} series · ${esc(repsLabel(alt[2]))}</small></span><span>→</span></button>`).join('');
 
     return `<article class="exercise-card ${done ? 'is-done' : ''}" id="card-${ex.id}">
   <div class="card-top">
     <div class="number">${String(index + 1).padStart(2, '0')}</div>
-    <div class="exercise-heading"><span class="muscle-tag">${esc(ex.muscle)}</span><h3>${esc(active.name)}</h3><p class="prescription"><b>${active.sets} series</b><span>·</span>${esc(active.reps)} reps<span>·</span>RIR objetivo ${esc(ex.rir || '1–2')}</p></div>
+    <div class="exercise-heading"><span class="muscle-tag">${esc(ex.muscle)}</span><h3>${esc(active.name)}</h3><p class="prescription"><b>${active.sets} series</b><span>·</span>${esc(repsLabel(active.reps))}<span>·</span>RIR objetivo ${esc(ex.rir || '1–2')}</p></div>
     <label class="done-control" title="Marcar ejercicio completado"><input type="checkbox" class="done-check" ${done ? 'checked' : ''} aria-label="Marcar ${esc(active.name)} como hecho"><span>✓</span></label>
   </div>
   <div class="exercise-log-row">
@@ -166,8 +169,8 @@
   </div>
   <div class="progression-slot">${progressionMarkup(progression(ex, active, record))}</div>
   <div class="card-actions"><button class="subtle-button alternatives-btn" type="button" aria-expanded="false">⇄ <span>Cambiar variante</span></button><button class="subtle-button note-btn" type="button" aria-expanded="false">ⓘ <span>Técnica</span></button></div>
-  <div class="alternatives-panel" hidden><p class="panel-label">ELIGE LA VARIANTE QUE HAS HECHO</p>${alternatives}<button class="reset-variant" type="button">Volver al ejercicio principal</button></div>
-  <div class="note-panel" hidden><p>${esc(ex.note || 'Mantén una técnica controlada.')}</p><p class="fineprint">RIR significa las repeticiones que podrías haber hecho antes del fallo técnico.</p></div>
+  <div class="alternatives-panel" hidden><p class="panel-label">ELIGE LA VARIANTE QUE HAS HECHO</p><p class="fineprint">Sustituye al ejercicio principal (no se añade). Mantén sus series y repeticiones y empieza con una carga conservadora.</p>${alternatives}<button class="reset-variant" type="button">Volver al ejercicio principal</button></div>
+  <div class="note-panel" hidden><p><b>Ejecución.</b> ${esc(ex.exec)}</p><p><b>Consejo.</b> ${esc(ex.tip)}</p><p class="fineprint">RIR significa las repeticiones que podrías haber hecho antes del fallo técnico.</p></div>
 </article>`;
   }
 
@@ -316,6 +319,21 @@
     reader.readAsText(file);
   }
 
+  // Comprueba qué ejercicios de la rutina (y sus alternativas) tienen animación.
+  async function auditAnimations() {
+    const out = $('auditResult');
+    out.hidden = false;
+    out.textContent = 'Comprobando…';
+    const result = await window.AetherAnimations.audit();
+    if (!result.datasetOk) {
+      out.textContent = 'No se pudo cargar el catálogo de animaciones. Conecta a internet e inténtalo de nuevo.';
+    } else if (!result.missing.length) {
+      out.textContent = `Los ${result.total} ejercicios tienen animación.`;
+    } else {
+      out.textContent = `${result.total - result.missing.length} de ${result.total} ejercicios tienen animación. Sin animación:\n• ${result.missing.join('\n• ')}`;
+    }
+  }
+
   // ======================================================================
   // Historial
   // ======================================================================
@@ -449,6 +467,7 @@
     $('exportBtn').addEventListener('click', exportData);
     $('exportSettings').addEventListener('click', exportData);
     $('importInput').addEventListener('change', importData);
+    $('auditBtn').addEventListener('click', auditAnimations);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
 
