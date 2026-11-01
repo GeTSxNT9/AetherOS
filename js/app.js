@@ -330,7 +330,7 @@
     } else if (!result.missing.length) {
       out.textContent = `Los ${result.total} ejercicios tienen animación.`;
     } else {
-      out.textContent = `${result.total - result.missing.length} de ${result.total} ejercicios tienen animación. Sin animación:\n• ${result.missing.join('\n• ')}`;
+      out.textContent = `${result.total - result.missing.length} de ${result.total} ejercicios tienen animación. Sin animación:\n${result.missing.map(m => `• ${m.name}${m.similar.length ? `\n   Parecidos en el dataset: ${m.similar.join(' / ')}` : ''}`).join('\n')}`;
     }
   }
 
