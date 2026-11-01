@@ -299,7 +299,10 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .alternative-option > span:last-child { color: var(--accent); font-size: 17px; }
 .reset-variant { margin-top: 12px; padding: 5px 0; border: 0; background: transparent; color: var(--accent); font-size: 11px; }
 .note-panel p { font-size: 12px; color: #d0d1da; margin: 0 0 10px; }
+.note-panel b { color: var(--text); }
 .note-panel .fineprint { color: var(--muted); margin: 0; }
+.alternatives-panel .fineprint { margin: 0 0 4px; }
+.audit-result { white-space: pre-line; }
 
 .rest-panel { padding: 28px 22px; text-align: center; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
 .rest-icon { display: grid; place-items: center; width: 44px; height: 44px; margin: 0 auto 13px; border-radius: 15px; background: #292b34; color: var(--accent); font-size: 23px; }
