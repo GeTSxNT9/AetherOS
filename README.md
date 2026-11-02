@@ -2,7 +2,7 @@
 
 **AetherOS** (Sessio Log) is a Progressive Web Application (PWA) to follow a Monday-to-Friday training routine, record the weight, repetitions, and RIR of each exercise, apply a double-progression criterion, and review the session history and progress statistics.
 
-It is built with HTML, CSS, and JavaScript without an application framework or its own backend. Working information is stored in the browser of the device; there are no accounts and no synchronization.
+The application is implemented in vanilla HTML, CSS, and JavaScript, with no framework or server-side component. Working data is stored locally in the browser of the device; there are no accounts and no synchronization.
 
 ## Main Features
 
