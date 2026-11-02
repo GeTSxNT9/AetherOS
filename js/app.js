@@ -319,35 +319,6 @@
     reader.readAsText(file);
   }
 
-  // Comprueba qué ejercicios de la rutina (y sus alternativas) tienen animación.
-  async function auditAnimations() {
-    const out = $('auditResult');
-    out.hidden = false;
-    out.textContent = 'Comprobando…';
-    const result = await window.AetherAnimations.audit();
-    if (!result.datasetOk) {
-      out.textContent = 'No se pudo cargar el catálogo de animaciones. Conecta a internet e inténtalo de nuevo.';
-    } else if (!result.missing.length) {
-      out.textContent = `Los ${result.total} ejercicios tienen animación.`;
-    } else {
-      out.textContent = `${result.total - result.missing.length} de ${result.total} ejercicios tienen animación. Sin animación:\n${result.missing.map(m => `• ${m.name}${m.similar.length ? `\n   Parecidos en el dataset: ${m.similar.join(' / ')}` : ''}`).join('\n')}`;
-    }
-  }
-
-  // Descarga qué animación se muestra en cada ejercicio (para fijarlas en la app).
-  async function downloadChosenAnimations() {
-    const out = $('auditResult');
-    out.hidden = false;
-    const text = await window.AetherAnimations.chosenReport();
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'aetheros-mis-animaciones.txt';
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    out.textContent = 'Archivo descargado.';
-  }
-
   // ======================================================================
   // Historial
   // ======================================================================
@@ -464,6 +435,9 @@
   }
 
   function init() {
+    // Limpieza: preferencias de animación de versiones de prueba anteriores.
+    Object.keys(localStorage).filter(key => key.startsWith('aetheros_v2_anim_')).forEach(key => localStorage.removeItem(key));
+
     const today = WEEKDAYS[new Date().getDay()];
     const isTrainingDay = DAYS.includes(today);
     currentDay = isTrainingDay ? today : DAYS[0];
@@ -481,8 +455,6 @@
     $('exportBtn').addEventListener('click', exportData);
     $('exportSettings').addEventListener('click', exportData);
     $('importInput').addEventListener('change', importData);
-    $('auditBtn').addEventListener('click', auditAnimations);
-    $('chosenBtn').addEventListener('click', downloadChosenAnimations);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
 
