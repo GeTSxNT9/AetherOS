@@ -1,63 +1,92 @@
-# AetherOS — Sessio Log
+# AetherOS
 
-Aplicación web personal de entrenamiento, pensada para móvil y con funcionamiento local-first.
+**AetherOS** (Sessio Log) is a personal Progressive Web Application (PWA) to follow a Monday-to-Friday training routine, log weights, repetitions, and RIR, and review progress. It is designed for use on a phone and works with the data stored on the device itself.
 
-## Funciones
-- Rutina de cinco días con variantes por ejercicio.
-- Registro de carga, repeticiones y RIR; admite un valor común o valores separados por serie mediante punto y coma.
-- Sugerencias orientativas de doble progresión basadas en las series registradas.
-- Historial y estadísticas de volumen, repeticiones, cargas y frecuencia.
-- Temporizador de descanso, exportación e importación de copias de seguridad.
-- Icono, diseño adaptable, caché offline y carga de animaciones de ejercicios.
+It is built with HTML, CSS, and JavaScript without an application framework or its own backend. There are no accounts and no synchronization: records live in the browser and can be moved with exported backups.
 
-## Publicación
-Sube los archivos conservando sus rutas y activa GitHub Pages desde la rama y carpeta que uses. No borres el almacenamiento local del navegador si quieres conservar registros anteriores.
+## Main Features
 
-## Datos y copias de seguridad
-Los registros nuevos se guardan en el espacio local `aetheros_v2_`. La aplicación no sincroniza automáticamente los datos entre dispositivos. Exporta periódicamente una copia JSON y guárdala en un lugar seguro. La importación combina los registros compatibles con los datos locales existentes.
+- Five-day routine (30 exercises) with 65 alternatives, plus an execution description and a technique tip for every exercise.
+- Day selector, session summary with completion percentage, and a "done" mark per exercise that resets every day.
+- Weight, repetitions, and RIR logging: accepts one common value for all sets or one value per set separated by semicolons (for example, `40;40;37,5`).
+- Per-exercise variant switching; each variant keeps its own records.
+- Orientative double-progression suggestion when the top of the repetition range is reached with the planned RIR.
+- Session history with the detail of every exercise.
+- Statistics: sessions, total and weekly volume, repetitions, weekly frequency, and evolution of the maximum load per exercise.
+- Rest timer (2 minutes) with vibration alert.
+- Animation for every exercise and alternative, loaded from a public exercise catalog.
+- JSON backups: export and import.
+- Installable PWA with a floating bottom navigation bar and offline operation.
 
-## Animaciones y atribución
-Las animaciones se resuelven por listas explícitas de nombres del catálogo [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset). Si no hay una coincidencia exacta, la app muestra un aviso en lugar de una animación potencialmente incorrecta. Los GIF y miniaturas se atribuyen a Gym visual; consulta el archivo `LICENSE` y `NOTICE.md` del repositorio de origen para las condiciones aplicables a los medios. Los datos y el código del repositorio de origen indican licencia MIT, pero los medios tienen términos de uso separados.
+## Current Architecture
 
-## Versión 2.6.0
-- Nueva barra inferior flotante (estilo cristal) separada del borde de la pantalla y del indicador de inicio del iPhone. El temporizador de descanso queda justo encima, con el mismo ancho.
-- Hoja de estilos reescrita desde cero (de ~62 KB con capas de `!important` a ~22 KB), con el mismo aspecto.
-- Código JavaScript reorganizado y comentado; eliminado código sin uso y catálogo de animaciones deduplicado.
-- Gráficos de barras corregidos (ahora son proporcionales) y gráfico de evolución de cargas en SVG, ordenado de más antiguo a más reciente.
-- La sugerencia de doble progresión ya contempla "última serie RIR 1".
-- Service worker: la versión de caché se cambia en una sola constante (`CACHE_VERSION` en `sw.js`).
+```text
+AetherOS-main/
+├── index.html                  # Interface, views, and ordered module loading
+├── css/
+│   └── aetheros.css            # Visual design, layout, bottom dock, and responsive rules
+├── js/
+│   ├── routine-data.js         # Routine: days, exercises, alternatives, execution, and tips
+│   ├── tracker-store.js        # localStorage access, sessions, and backups
+│   ├── exercise-animations.js  # Exercise → animation catalog, GIF download and cache
+│   └── app.js                  # Interface, logging, progression, history, statistics, and timer
+├── manifest.json               # PWA installation metadata
+├── sw.js                       # Installation, update, and offline cache
+├── icon-192.png
+├── icon-512.png
+├── apple-touch-icon.png
+├── favicon-32.png
+└── README.md
+```
 
-## Versión 2.6.1
-- Las marcas de ejercicio hecho se reinician cada día (los pesos y repeticiones se conservan).
-- Dock inferior con la mitad de separación, iconos nuevos y cuadros de animación/registro menos altos.
+### Responsibilities and Limits
 
-## Versión 2.7.0
-- Rutina actualizada según «Rutina de Entrenamiento Semanal» (30 ejercicios, 67 alternativas, ejecución y consejo de cada uno).
-- Catálogo de animaciones revisado ejercicio por ejercicio; en Opciones hay un botón «Comprobar animaciones» que lista los que no tienen GIF.
+- The four files in `js/` are plain scripts that share the global scope and **must be loaded in the order listed in `index.html`**: routine and storage first, then animations, and finally `app.js`.
+- `routine-data.js` is the single source of the routine. To change exercises, sets, or texts, edit it. The `id` of each exercise is the key under which its records are saved: **do not change it** if you want to keep previous weights.
+- `tracker-store.js` is the only module that reads and writes `localStorage` for training data; `app.js` only uses its interface (`AetherStore`).
+- `exercise-animations.js` holds the catalog that assigns every exercise (and every alternative) the exact name of its animation. If you add a new exercise to the routine, add its line to that catalog too; without it a notice is shown instead of the GIF.
+- `css/aetheros.css` groups the styles by section (variables, header, exercise cards, history and statistics, bottom dock, and responsive adjustments). The measurements of the bottom dock (navigation bar and timer) are variables at the top of the file.
+- This separation is architectural; the repository does not include an automated test suite.
 
-## Versión 2.7.1
-- Animaciones: la coincidencia ya no depende del orden de las palabras del nombre y hay más nombres alternativos por ejercicio.
-- «Comprobar animaciones» sugiere los nombres parecidos reales del dataset para los ejercicios que sigan sin GIF.
+## Data and Persistence
 
-## Versión 2.7.2
-- Catálogo de animaciones ajustado con los nombres reales del dataset para los últimos ejercicios sin GIF.
+- `localStorage` stores, under the `aetheros_v2_` prefix, the records per exercise and variant, the "done" marks, the chosen variant, and the history sessions.
+- The "done" mark stores the date on which it was set, so all exercises appear unmarked when the day changes. Weights, repetitions, and RIR are kept so the last performance is visible.
+- Exported backups (`aetheros-backup-v2`) are the recommended way to move or recover data. Import validates the whole file before writing anything and merges the compatible records with the existing local data. Make an export before updating the application or clearing browser data.
+- Do not change the `aetheros_v2_` prefix or delete keys manually if you want to keep your records.
+- Data never leaves the device and is not synchronized between devices.
 
-## Versión 2.8.0
-- Ajustes de rutina: nombres y alternativas actualizados, extensión unilateral de tríceps en polea alta y animaciones corregidas.
-- Opciones: botón para descargar la lista de ejercicios del dataset.
-- Pestaña «Técnica» sin la explicación del RIR.
+## Progression
 
-## Versión 2.9.0
-- Animaciones revisadas contra el listado real del dataset (1323 ejercicios).
-- Si un ejercicio tiene varias animaciones posibles, un botón ↻ sobre el GIF permite cambiar de una a otra y la app recuerda la elección.
+The double-progression suggestion appears when every logged set reaches the top of the repetition range and the RIR of each set is between the target and one more (for exercises marked "last set RIR 1", the last set is checked against 1). It proposes adding 1 kg for dumbbell exercises, 5 kg for lower body, and 2.5 kg for the rest. It is guidance, not a prescription.
 
-## Versión 2.9.1
-- Curl bayesiano y curl femoral deslizante con animación aproximada.
-- Opciones: «Descargar mis animaciones elegidas» (sustituye a la descarga de la lista del dataset).
+## Exercise Animations and Attribution
 
-## Versión 3.0.0
-- Animaciones fijas (una por ejercicio) y eliminado el sistema de cambio y revisión.
-- Nuevo icono de mancuerna. Los iconos (`apple-touch-icon.png`, `favicon-32.png`, `icon-192.png`, `icon-512.png`) están ahora en la raíz del repositorio; la carpeta `icons/` ya no se usa y puede borrarse.
+Animations come from the public catalog [hasaneyldrm/exercises-dataset](https://github.com/hasaneyldrm/exercises-dataset). Each exercise in the routine is assigned the exact name of its animation; there is no approximate search, so an animation is never picked at random. If the name is not found or there is no connection, the app shows a notice.
 
-## Cómo publicar una actualización
-Sube los archivos modificados conservando sus rutas. Si cambias cualquier archivo de la app, sube también `CACHE_VERSION` en `sw.js` para que los móviles descarguen la versión nueva. Tras publicar, abre la app dos veces (la primera instala la actualización, la segunda la muestra).
+The application downloads the catalog file (`data/exercises.json`) once, remembers the GIF address of every exercise on the device, and from then on loads only the GIFs it needs.
+
+GIFs and thumbnails are credited to Gym visual (<https://gymvisual.com/>). See the `LICENSE` and `NOTICE.md` files of the source repository for the terms that apply to the media: data and code are MIT-licensed, but the media have separate terms of use.
+
+## PWA and Offline Operation
+
+The Service Worker uses versioned caching (`aetheros-v` + `CACHE_VERSION` in `sw.js`) and deletes old caches upon activation. Application resources are served cache-first; if one is missing it is requested from the network and stored, and `index.html` is used as a fallback when offline. During installation, essential resources are preloaded with a request that bypasses the browser's own copy (`cache: 'reload'`) so outdated files are not stored; if an essential resource is missing, the installation is cancelled instead of leaving an incomplete shell.
+
+GIFs and the exercise catalog are stored in a separate cache (`aetheros-gymvisual-v1`) that is not deleted when the application is updated. After the first load with a connection, the app downloads the animations of the whole routine in the background so they can be viewed offline.
+
+Records are stored in `localStorage`; the availability of the interface and animations offline depends on having loaded the application with a connection beforehand.
+
+## Deployment
+
+The application can be served as a static site with GitHub Pages: upload the files keeping the structure and enable Pages from the branch and folder you use. It does not require a build process.
+
+To publish an update:
+
+1. Upload the modified files keeping their paths.
+2. If you change any application file, increase `CACHE_VERSION` in `sw.js` so phones download the new version.
+3. Open the application twice: the first time installs the update and the second one shows it.
+4. If you change the icons, remove the installed app and add it to the home screen again.
+
+## Design and Goal
+
+AetherOS prioritizes clarity, large controls for one-handed use, and fast logging during training. Its goal is to make recording each set as effortless as possible and to show progress at a glance, without accounts, servers, or external dependencies, and with the data always under the user's control.
