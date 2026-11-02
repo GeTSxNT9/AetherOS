@@ -3,108 +3,104 @@
  * Los GIF pertenecen a Gym visual (© https://gymvisual.com/) y se cargan desde el
  * dataset público hasaneyldrm/exercises-dataset.
  *
- * Cada ejercicio (y cada alternativa) de la rutina tiene asignado el nombre EXACTO de su
- * animación en el dataset. Si en el futuro cambias o añades ejercicios en routine-data.js,
- * añade aquí una línea con el mismo nombre; sin ella se muestra un aviso en lugar del GIF.
+ * Cada ejercicio (y cada alternativa) de la rutina tiene asignado aquí el archivo exacto de su
+ * animación. Si cambias o añades ejercicios en routine-data.js, añade una línea con el mismo
+ * nombre; sin ella se muestra un aviso en lugar del GIF.
  */
 (() => {
   'use strict';
 
-  const DATA_URL = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/data/exercises.json?v=aetheros-1';
   const RAW_BASE = 'https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/main/';
   const MEDIA_CACHE = 'aetheros-gymvisual-v1'; // debe coincidir con sw.js
-  const ASSET_VERSION = 'aetheros-1';
   const ATTRIBUTION = '© Gym visual — https://gymvisual.com/';
-
-  let datasetPromise;
-  const resultCache = new Map();
 
   // Normaliza para comparar: sin tildes, minúsculas y sin signos.
   const norm = value => String(value || '')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-  /* Ejercicio de la rutina → nombre de su animación en el dataset. */
+  /* Ejercicio de la rutina → archivo del GIF dentro del dataset. */
   const CATALOG = {
-    "Press de pecho en máquina": 'lever chest press',
-    "Press de banca con barra": 'barbell bench press',
-    "Press de banca con mancuernas": 'dumbbell bench press',
-    "Press militar en máquina": 'lever military press',
-    "Press militar con mancuernas": 'dumbbell seated shoulder press',
-    "Aperturas en máquina Peck Deck": 'lever seated fly',
-    "Aperturas en poleas": 'cable middle fly',
-    "Aperturas con mancuernas": 'dumbbell fly',
-    "Elevaciones laterales con mancuernas": 'dumbbell lateral raise',
-    "Elevaciones laterales en polea": 'cable one arm lateral raise',
-    "Elevaciones laterales en máquina": 'lever lateral raise',
-    "Extensión unilateral de tríceps en polea alta": 'cable one arm tricep pushdown',
-    "Press francés tumbado con mancuernas": 'dumbbell lying triceps extension',
-    "Press francés con barra EZ": 'barbell lying triceps extension skull crusher',
-    "Extensión de tríceps por encima de la cabeza con mancuerna": 'dumbbell seated triceps extension',
-    "Jalón al pecho con agarre cerrado": 'cable lateral pulldown with v-bar',
-    "Dominadas asistidas": 'assisted pull-up',
-    "Dominadas con peso corporal": 'pull-up',
-    "Remo unilateral en máquina": 'lever alternating narrow grip seated row',
-    "Remo con mancuerna a una mano": 'dumbbell one arm bent-over row',
-    "Remo unilateral en máquina con apoyo pectoral": 'lever alternating narrow grip seated row',
-    "Remo sentado en polea baja": 'cable seated row',
-    "Remo inclinado con barra": 'barbell bent over row',
-    "Remo con mancuernas en banco inclinado": 'dumbbell incline row',
-    "Aperturas inversas en máquina Peck Deck": 'lever seated reverse fly',
-    "Aperturas posteriores con mancuernas en banco inclinado": 'dumbbell incline rear lateral raise',
-    "Aperturas posteriores con mancuernas de pie e inclinado": 'dumbbell rear lateral raise',
-    "Curl de bíceps con barra recta": 'barbell curl',
-    "Curl alterno con mancuernas": 'dumbbell alternate biceps curl',
-    "Curl de bíceps con barra EZ": 'ez barbell curl',
-    "Curl de bíceps sentado con mancuernas": 'dumbbell seated curl',
-    "Curl martillo cruzado": 'dumbbell cross body hammer curl',
-    "Curl martillo sentado": 'dumbbell seated hammer curl',
-    "Sentadilla Hack en máquina": 'sled hack squat',
-    "Sentadilla Goblet con mancuerna": 'dumbbell goblet squat',
-    "Sentadilla con barra": 'barbell full squat',
-    "Curl femoral sentado": 'lever seated leg curl',
-    "Curl femoral tumbado": 'lever lying leg curl',
-    "Curl femoral de pie": 'standing single leg curl',
-    "Curl femoral deslizante": 'low glute bridge on floor',
-    "Prensa de piernas inclinada": 'sled 45° leg press',
-    "Sentadilla búlgara con mancuernas": 'dumbbell single leg split squat',
-    "Extensión de cuádriceps en máquina": 'lever leg extension',
-    "Zancadas con mancuernas": 'dumbbell lunge',
-    "Elevación de talones en máquina": 'lever seated calf raise',
-    "Elevación de talones en prensa": 'sled calf press on leg press',
-    "Elevación de talones de pie con mancuernas": 'dumbbell standing calf raise',
-    "Crunch abdominal en máquina": 'lever seated crunch',
-    "Crunch abdominal en el suelo": 'crunch floor',
-    "Press de pecho inclinado en máquina": 'lever incline chest press',
-    "Press inclinado con mancuernas": 'dumbbell incline bench press',
-    "Press inclinado con barra": 'barbell incline bench press',
-    "Jalón al pecho con agarre ancho": 'cable bar lateral pulldown',
-    "Remo en máquina con apoyo pectoral": 'lever seated row',
-    "Remo con dos mancuernas en banco inclinado": 'dumbbell incline row',
-    "Fondos en paralelas asistidos": 'assisted triceps dip (kneeling)',
-    "Press de banca con agarre cerrado": 'barbell close-grip bench press',
-    "Flexiones": 'push-up',
-    "Elevaciones laterales de pie": 'dumbbell lateral raise',
-    "Elevaciones laterales sentado": 'dumbbell seated lateral raise',
-    "Elevaciones laterales unilaterales con apoyo": 'dumbbell one arm lateral raise',
-    "Extensión de tríceps por encima de la cabeza en polea": 'cable overhead triceps extension (rope attachment)',
-    "Press francés con mancuernas": 'dumbbell lying triceps extension',
-    "Hip Thrust en máquina": 'barbell glute bridge two legs on bench (male)',
-    "Hip Thrust con barra": 'barbell glute bridge two legs on bench (male)',
-    "Puente de glúteos con peso corporal": 'low glute bridge on floor',
-    "Peso muerto rumano con barra": 'barbell romanian deadlift',
-    "Peso muerto rumano con mancuernas": 'dumbbell romanian deadlift',
-    "Extensión de cadera en polea baja": 'cable standing hip extension',
-    "Patada de glúteo con mancuerna": 'cable standing hip extension',
-    "Puente de glúteos unilateral": 'single leg bridge with outstretched leg',
-    "Zancada hacia atrás con mancuernas": 'dumbbell rear lunge',
-    "Curl bayesiano de bíceps en polea a una mano": 'cable one arm curl',
-    "Curl inclinado con mancuernas": 'dumbbell incline biceps curl',
-    "Curl sentado con mancuernas": 'dumbbell seated curl',
-    "Curl de concentración con mancuerna": 'dumbbell concentration curl'
+    "Press de pecho en máquina": "videos/0577-T0yTjgW.gif",
+    "Press de banca con barra": "videos/0025-EIeI8Vf.gif",
+    "Press de banca con mancuernas": "videos/0289-SpYC0Kp.gif",
+    "Press militar en máquina": "videos/0587-CggQhII.gif",
+    "Press militar con mancuernas": "videos/0405-znQUdHY.gif",
+    "Aperturas en máquina Peck Deck": "videos/0596-v3xmPAR.gif",
+    "Aperturas en poleas": "videos/0188-xLYSdtg.gif",
+    "Aperturas con mancuernas": "videos/0308-yz9nUhF.gif",
+    "Elevaciones laterales con mancuernas": "videos/0334-DsgkuIt.gif",
+    "Elevaciones laterales en polea": "videos/0192-wEulIzp.gif",
+    "Elevaciones laterales en máquina": "videos/0584-dRTfGZT.gif",
+    "Extensión unilateral de tríceps en polea alta": "videos/1723-qRZ5S1N.gif",
+    "Press francés tumbado con mancuernas": "videos/0351-mpKZGWz.gif",
+    "Press francés con barra EZ": "videos/0060-h8LFzo9.gif",
+    "Extensión de tríceps por encima de la cabeza con mancuerna": "videos/2188-kont8Ut.gif",
+    "Jalón al pecho con agarre cerrado": "videos/2616-4c9BhzB.gif",
+    "Dominadas asistidas": "videos/0017-kiJ4Z2K.gif",
+    "Dominadas con peso corporal": "videos/0652-lBDjFxJ.gif",
+    "Remo unilateral en máquina": "videos/0571-w2oRpuH.gif",
+    "Remo con mancuerna a una mano": "videos/0292-C0MA9bC.gif",
+    "Remo unilateral en máquina con apoyo pectoral": "videos/0571-w2oRpuH.gif",
+    "Remo sentado en polea baja": "videos/0861-fUBheHs.gif",
+    "Remo inclinado con barra": "videos/0027-eZyBC3j.gif",
+    "Remo con mancuernas en banco inclinado": "videos/0327-7vG5o25.gif",
+    "Aperturas inversas en máquina Peck Deck": "videos/0602-myfUsKf.gif",
+    "Aperturas posteriores con mancuernas en banco inclinado": "videos/0326-vYk8lqw.gif",
+    "Aperturas posteriores con mancuernas de pie e inclinado": "videos/0380-v1qBec9.gif",
+    "Curl de bíceps con barra recta": "videos/0031-25GPyDY.gif",
+    "Curl alterno con mancuernas": "videos/0285-BU15nH4.gif",
+    "Curl de bíceps con barra EZ": "videos/0447-6TG6x2w.gif",
+    "Curl de bíceps sentado con mancuernas": "videos/0391-TiaZTxx.gif",
+    "Curl martillo cruzado": "videos/0298-Qyk5J3p.gif",
+    "Curl martillo sentado": "videos/1678-IGtBdNT.gif",
+    "Sentadilla Hack en máquina": "videos/0743-Qa55kX1.gif",
+    "Sentadilla Goblet con mancuerna": "videos/1760-yn8yg1r.gif",
+    "Sentadilla con barra": "videos/0043-qXTaZnJ.gif",
+    "Curl femoral sentado": "videos/0599-Zg3XY7P.gif",
+    "Curl femoral tumbado": "videos/0586-17lJ1kr.gif",
+    "Curl femoral de pie": "videos/0795-C5jncD2.gif",
+    "Curl femoral deslizante": "videos/3013-u0cNiij.gif",
+    "Prensa de piernas inclinada": "videos/0739-10Z2DXU.gif",
+    "Sentadilla búlgara con mancuernas": "videos/0410-qx4fgX7.gif",
+    "Extensión de cuádriceps en máquina": "videos/0585-my33uHU.gif",
+    "Zancadas con mancuernas": "videos/0336-RRWFUcw.gif",
+    "Elevación de talones en máquina": "videos/0594-bOOdeyc.gif",
+    "Elevación de talones en prensa": "videos/1391-ykHcWme.gif",
+    "Elevación de talones de pie con mancuernas": "videos/0417-dPmaUaU.gif",
+    "Crunch abdominal en máquina": "videos/1452-Wgaz7pm.gif",
+    "Crunch abdominal en el suelo": "videos/0274-TFqbd8t.gif",
+    "Press de pecho inclinado en máquina": "videos/1299-jHAnWmT.gif",
+    "Press inclinado con mancuernas": "videos/0314-ns0SIbU.gif",
+    "Press inclinado con barra": "videos/0047-3TZduzM.gif",
+    "Jalón al pecho con agarre ancho": "videos/0150-eYnzaCm.gif",
+    "Remo en máquina con apoyo pectoral": "videos/1350-7I6LNUG.gif",
+    "Remo con dos mancuernas en banco inclinado": "videos/0327-7vG5o25.gif",
+    "Fondos en paralelas asistidos": "videos/0019-J60bN17.gif",
+    "Press de banca con agarre cerrado": "videos/0030-J6Dx1Mu.gif",
+    "Flexiones": "videos/0662-I4hDWkc.gif",
+    "Elevaciones laterales de pie": "videos/0334-DsgkuIt.gif",
+    "Elevaciones laterales sentado": "videos/0396-hxyTtWj.gif",
+    "Elevaciones laterales unilaterales con apoyo": "videos/0355-n5cWCsI.gif",
+    "Extensión de tríceps por encima de la cabeza en polea": "videos/0194-2IxROQ1.gif",
+    "Press francés con mancuernas": "videos/0351-mpKZGWz.gif",
+    "Hip Thrust en máquina": "videos/3562-qg2PGl6.gif",
+    "Hip Thrust con barra": "videos/3562-qg2PGl6.gif",
+    "Puente de glúteos con peso corporal": "videos/3013-u0cNiij.gif",
+    "Peso muerto rumano con barra": "videos/0085-wQ2c4XD.gif",
+    "Peso muerto rumano con mancuernas": "videos/1459-rR0LJzx.gif",
+    "Extensión de cadera en polea baja": "videos/0228-Kpajagk.gif",
+    "Patada de glúteo con mancuerna": "videos/0228-Kpajagk.gif",
+    "Puente de glúteos unilateral": "videos/3645-rmEukuS.gif",
+    "Zancada hacia atrás con mancuernas": "videos/0381-SSsBDwB.gif",
+    "Curl bayesiano de bíceps en polea a una mano": "videos/0190-YTur5nR.gif",
+    "Curl inclinado con mancuernas": "videos/0315-F3xgbjF.gif",
+    "Curl sentado con mancuernas": "videos/0391-TiaZTxx.gif",
+    "Curl de concentración con mancuerna": "videos/0297-gvsWLQw.gif"
   };
 
-  const ALLOWED = new Map(Object.entries(CATALOG).map(([name, datasetName]) => [norm(name), norm(datasetName)]));
+  const FILES = new Map(Object.entries(CATALOG).map(([name, file]) => [norm(name), file]));
+  const gifUrl = name => (FILES.has(norm(name)) ? RAW_BASE + FILES.get(norm(name)) : null);
 
   // ---- Descarga con caché local (funciona sin conexión tras la primera carga) ----
   async function fetchAndCache(url) {
@@ -119,76 +115,15 @@
     return response;
   }
 
-  function getDataset() {
-    if (!datasetPromise) {
-      datasetPromise = fetchAndCache(DATA_URL)
-        .then(response => response.json())
-        .then(data => (Array.isArray(data) ? data : []))
-        .catch(() => []);
-      datasetPromise.then(items => { if (!items.length) datasetPromise = undefined; }); // permite reintentar
-    }
-    return datasetPromise;
-  }
-
-  // Índice del dataset por nombre normalizado (se construye una sola vez).
-  let indexed = { items: null, map: null };
-  function indexOf(items) {
-    if (indexed.items !== items) {
-      const map = new Map();
-      items.forEach(entry => { if (entry.gif_url && !map.has(norm(entry.name))) map.set(norm(entry.name), entry); });
-      indexed = { items, map };
-    }
-    return indexed.map;
-  }
-
-  // Direcciones de GIF ya resueltas, guardadas en el dispositivo (fuera de las copias de seguridad).
-  // Gracias a ellas el catálogo completo (muy pesado) solo se descarga la primera vez.
-  const MEMORY_KEY = 'aetheros_gif_urls';
-  const readMemory = () => {
-    try { return JSON.parse(localStorage.getItem(MEMORY_KEY)) || {}; } catch { return {}; }
-  };
-  const remember = (key, entry) => {
-    try { localStorage.setItem(MEMORY_KEY, JSON.stringify({ ...readMemory(), [key]: entry })); } catch { /* sin almacenamiento */ }
-  };
-  const toMatch = entry => {
-    const file = String(entry.file).replace(/^\.\//, '');
-    const url = new URL(file, RAW_BASE);
-    url.searchParams.set('v', ASSET_VERSION);
-    return { url: url.href, file, name: entry.name, attribution: ATTRIBUTION };
-  };
-
-  // ---- Animación de un ejercicio (o null si no está en el catálogo) ----
-  function resolve(name) {
-    const key = norm(name);
-    if (resultCache.has(key)) return resultCache.get(key);
-    const promise = (async () => {
-      const wanted = ALLOWED.get(key);
-      if (!wanted) return null;
-      const saved = readMemory()[key];
-      if (saved && saved.dataset === wanted) return toMatch(saved);
-      const items = await getDataset();
-      if (!items.length) { resultCache.delete(key); return null; } // sin catálogo: se reintentará más tarde
-      const item = indexOf(items).get(wanted);
-      if (!item) return null;
-      const entry = { dataset: wanted, name: item.name, file: item.gif_url };
-      remember(key, entry);
-      return toMatch(entry);
-    })();
-    resultCache.set(key, promise);
-    return promise;
-  }
-
   // ---- Rellena los marcadores .technique-placeholder con su GIF ----
-  async function hydrate(root) {
-    const nodes = [...(root || document).querySelectorAll('.technique-placeholder[data-animation-name]')];
-    await Promise.all(nodes.map(async node => {
+  function hydrate(root) {
+    (root || document).querySelectorAll('.technique-placeholder[data-animation-name]').forEach(node => {
       if (node.dataset.hydrated === '1') return;
       node.dataset.hydrated = '1';
       const name = node.dataset.animationName;
-      const match = await resolve(name);
-      if (!node.isConnected) return;
+      const url = gifUrl(name);
 
-      if (!match) {
+      if (!url) {
         node.innerHTML = '<span class="play-symbol">ⓘ</span><span>Demostración técnica</span><small>Animación no disponible</small>';
         node.setAttribute('aria-label', 'No hay animación disponible para este ejercicio');
         return;
@@ -199,43 +134,28 @@
       img.alt = `Animación de ${name}`;
       img.loading = 'lazy';
       img.decoding = 'async';
-      img.src = match.url;
+      img.src = url;
       img.addEventListener('error', () => {
         node.innerHTML = '<span class="play-symbol">ⓘ</span><span>Demostración técnica</span><small>Animación no disponible; conecta a internet</small>';
       }, { once: true });
       node.innerHTML = '';
       node.appendChild(img);
-      node.setAttribute('aria-label', `Animación técnica: ${match.name}. ${match.attribution}`);
-    }));
+      node.setAttribute('aria-label', `Animación técnica: ${name}. ${ATTRIBUTION}`);
+    });
   }
 
   // ---- Descarga previa de todos los GIF de la rutina para usarlos sin conexión ----
   async function prefetchRoutine() {
     if (!navigator.onLine) return;
-    const names = new Set();
+    const urls = new Set();
     Object.values(window.AETHER_ROUTINE || {}).forEach(day => day.exercises.forEach(ex => {
-      names.add(ex.name);
-      ex.alternatives.forEach(alt => names.add(alt[0]));
+      [ex.name, ...ex.alternatives.map(alt => alt[0])].forEach(name => { if (gifUrl(name)) urls.add(gifUrl(name)); });
     }));
-    const matches = (await Promise.all([...names].map(resolve))).filter(Boolean);
-    for (let i = 0; i < matches.length; i += 3) {
-      await Promise.all(matches.slice(i, i + 3).map(item => fetchAndCache(item.url).catch(() => null)));
+    const list = [...urls];
+    for (let i = 0; i < list.length; i += 3) {
+      await Promise.all(list.slice(i, i + 3).map(url => fetchAndCache(url).catch(() => null)));
     }
   }
 
-  // Lista "ejercicio => archivo del GIF" de toda la rutina (para fijarla en el código).
-  async function gifList() {
-    const names = new Set();
-    Object.values(window.AETHER_ROUTINE || {}).forEach(day => day.exercises.forEach(ex => {
-      names.add(ex.name);
-      ex.alternatives.forEach(alt => names.add(alt[0]));
-    }));
-    const lines = await Promise.all([...names].map(async name => {
-      const match = await resolve(name);
-      return `${name} => ${match ? match.file : '(sin animación)'}`;
-    }));
-    return lines.join('\n');
-  }
-
-  window.AetherAnimations = { hydrate, prefetchRoutine, gifList };
+  window.AetherAnimations = { hydrate, prefetchRoutine };
 })();

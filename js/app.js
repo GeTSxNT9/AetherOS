@@ -39,62 +39,28 @@
     return `${d.getUTCFullYear()} S${String(week).padStart(2, '0')}`;
   }
 
-  // "8 10 12" / "8,10,12" / "8;10;12" → [8, 10, 12]
-  const parseNums = value => String(value ?? '').trim().split(/[,;\s]+/)
-    .map(x => x.trim()).filter(Boolean).map(Number).filter(n => Number.isFinite(n) && n >= 0);
-
-  // Pesos: las series se separan con ";" (o espacios). Se admiten comas antiguas, y una
-  // única coma decimal sigue siendo válida (p. ej. "40,5" = 40.5 kg).
-  function parseWeights(value) {
-    const raw = String(value ?? '').trim();
-    if (!raw) return [];
-    let parts;
-    if (raw.includes(';') || /\s/.test(raw)) {
-      parts = raw.split(/[;\s]+/);
-    } else if ((raw.match(/,/g) || []).length > 1) {
-      parts = raw.split(',');
-    } else if (raw.includes(',')) {
-      const decimals = raw.split(',')[1];
-      parts = decimals.length === 1 ? [raw.replace(',', '.')] : raw.split(',');
-    } else {
-      parts = [raw];
-    }
-    return parts.map(x => Number(x.trim().replace(',', '.'))).filter(n => Number.isFinite(n) && n >= 0);
-  }
-
-  // Un valor único se repite en todas las series; varios valores se usan tal cual.
-  function seriesValues(value, parser, sets) {
-    const values = parser(value);
-    if (!values.length) return [];
-    if (values.length === 1) return Array(Math.max(1, Number(sets) || 1)).fill(values[0]);
-    return values;
+  // Un único número por campo; se admite coma decimal ("62,5" = 62.5 kg).
+  // Si un registro antiguo contiene varios valores ("40;40;35"), se usa el primero.
+  function toNumber(value) {
+    const first = String(value ?? '').trim().split(/[;\s]+/)[0];
+    const clean = (first.match(/,/g) || []).length > 1 ? first.split(',')[0] : first;
+    const number = Number(clean.replace(',', '.'));
+    return clean !== '' && Number.isFinite(number) && number >= 0 ? number : null;
   }
 
   // ======================================================================
   // Cálculos de volumen y repeticiones
   // ======================================================================
+  // Volumen = peso × repeticiones × series; repeticiones totales = repeticiones × series.
+  const entrySets = entry => Math.max(1, Number(entry.sets) || 1);
+
   function entryVolume(entry) {
-    const sets = Math.max(1, Number(entry.sets) || 1);
-    const weights = parseWeights(entry.weight);
-    const reps = parseNums(entry.reps);
-    if (!weights.length || !reps.length) return 0;
-
-    const perSet = weights.length > 1 || reps.length > 1;
-    if (!perSet) return weights[0] * reps[0] * sets;
-
-    let total = 0;
-    const count = Math.max(weights.length, reps.length);
-    for (let i = 0; i < count; i++) {
-      total += weights[Math.min(i, weights.length - 1)] * reps[Math.min(i, reps.length - 1)];
-    }
-    return total;
+    const weight = toNumber(entry.weight);
+    const reps = toNumber(entry.reps);
+    return weight === null || reps === null ? 0 : weight * reps * entrySets(entry);
   }
 
-  function entryReps(entry) {
-    const values = parseNums(entry.reps);
-    const sum = values.reduce((a, b) => a + b, 0);
-    return values.length === 1 ? sum * (Number(entry.sets) || 1) : sum;
-  }
+  const entryReps = entry => (toNumber(entry.reps) ?? 0) * entrySets(entry);
 
   const sessionVolume = session => session.entries.reduce((sum, e) => sum + entryVolume(e), 0);
   const sessionReps = session => session.entries.reduce((sum, e) => sum + entryReps(e), 0);
@@ -112,7 +78,7 @@
 
   const readRecord = (ex, active) => AetherStore.getExercise(currentDay, ex.id, active.selectedAlternative ? active.name : null);
 
-  // Doble progresión: si todas las series llegan al máximo del rango con el RIR previsto,
+  // Doble progresión: si las repeticiones llegan al máximo del rango con el RIR previsto,
   // se sugiere subir un poco el peso en la siguiente sesión.
   function progression(ex, active, record) {
     if (/rir/i.test(active.reps)) return null; // series "al RIR" (p. ej. dominadas): sin rango de reps
@@ -120,28 +86,20 @@
     if (!range) return null;
 
     const top = Number(range[2]);
-    const sets = active.sets;
-    const reps = seriesValues(record.reps, parseNums, sets);
-    const rir = seriesValues(record.rir, parseNums, sets);
-    const weights = parseWeights(record.weight);
-    if (!reps.length || !rir.length || !weights.length) return null;
-    if (reps.length < sets || rir.length < sets) return null;
+    const reps = toNumber(record.reps);
+    const rir = toNumber(record.rir);
+    const weight = toNumber(record.weight);
+    if (reps === null || rir === null || weight === null) return null;
 
     const expectedRir = Number((String(ex.rir).match(/\d+/) || ['2'])[0]);
-    const lastSetRir1 = /ultima serie\s*1/.test(norm(ex.rir)); // p. ej. "2 (última serie 1)"
-    const reachedTop = reps.slice(0, sets).every(value => value >= top);
-    const rirOk = rir.slice(0, sets).every((value, index) => {
-      const target = lastSetRir1 && index === sets - 1 ? 1 : expectedRir;
-      return value >= target && value <= target + 1;
-    });
-    if (!reachedTop || !rirOk) return null;
+    const lowestRir = /ultima serie\s*1/.test(norm(ex.rir)) ? 1 : expectedRir; // p. ej. "2 (última serie 1)"
+    if (reps < top || rir < lowestRir || rir > expectedRir + 1) return null;
 
     const muscle = norm(ex.muscle);
     const name = norm(active.name);
     const lowerBody = muscle.includes('pierna') || muscle.includes('gluteo') || name.includes('sentadilla') || name.includes('prensa') || name.includes('hip thrust');
     const step = name.includes('mancuerna') ? 1 : (lowerBody ? 5 : 2.5);
-    const current = Math.max(...weights);
-    return { current, proposed: Math.round((current + step) * 2) / 2, step, top, sets };
+    return { proposed: Math.round((weight + step) * 2) / 2, step, top, sets: active.sets };
   }
 
   const progressionMarkup = suggestion => suggestion
@@ -153,7 +111,7 @@
     const record = readRecord(ex, active);
     const done = AetherStore.isDone(currentDay, ex.id);
     const field = (label, key) =>
-      `<label><span>${label}</span><input inputmode="${key === 'weight' ? 'decimal' : 'text'}" type="text" data-field="${key}" value="${esc(record[key] || '')}"></label>`;
+      `<label><span>${label}</span><input inputmode="${key === 'weight' ? 'decimal' : 'numeric'}" type="text" data-field="${key}" value="${esc(record[key] || '')}"></label>`;
     const alternatives = ex.alternatives.map((alt, i) =>
       `<button class="alternative-option" type="button" data-alt="${i}"><span><b>${esc(alt[0])}</b><small>${alt[1]} series · ${esc(repsLabel(alt[2]))}</small></span><span>→</span></button>`).join('');
 
@@ -319,17 +277,6 @@
     reader.readAsText(file);
   }
 
-  // Descarga la lista de direcciones de GIF de la rutina.
-  async function downloadGifList() {
-    const text = await window.AetherAnimations.gifList();
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'aetheros-direcciones-gif.txt';
-    link.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-
   // ======================================================================
   // Historial
   // ======================================================================
@@ -419,9 +366,9 @@
     if (chosen && !select.value) select.value = chosen;
 
     const loads = entries
-      .filter(e => e.name === chosen && parseWeights(e.weight).length)
+      .filter(e => e.name === chosen && toNumber(e.weight) !== null)
       .slice(-12)
-      .map(e => ({ label: e.date.slice(5), value: Math.max(...parseWeights(e.weight)) }));
+      .map(e => ({ label: e.date.slice(5), value: toNumber(e.weight) }));
     $('loadChart').innerHTML = lineChart(loads);
 
     $('repChart').innerHTML = '<h4>Repeticiones por sesión</h4>' +
@@ -446,8 +393,8 @@
   }
 
   function init() {
-    // Limpieza: preferencias de animación de versiones de prueba anteriores.
-    Object.keys(localStorage).filter(key => key.startsWith('aetheros_v2_anim_')).forEach(key => localStorage.removeItem(key));
+    // Limpieza de datos de versiones de prueba anteriores (animaciones elegidas y direcciones recordadas).
+    Object.keys(localStorage).filter(key => key.startsWith('aetheros_v2_anim_') || key === 'aetheros_gif_urls').forEach(key => localStorage.removeItem(key));
 
     const today = WEEKDAYS[new Date().getDay()];
     const isTrainingDay = DAYS.includes(today);
@@ -466,7 +413,6 @@
     $('exportBtn').addEventListener('click', exportData);
     $('exportSettings').addEventListener('click', exportData);
     $('importInput').addEventListener('change', importData);
-    $('gifUrlsBtn').addEventListener('click', downloadGifList);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
 
