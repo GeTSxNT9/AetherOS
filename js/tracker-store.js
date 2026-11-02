@@ -168,5 +168,17 @@
     return staged.length;
   }
 
-  window.AetherStore = { getExercise, saveExercise, isDone, setDone, getVariant, setVariant, saveSession, listSessions, exportAll, importAll };
+  // ---------- Reinicio ----------
+  // Borra todos los datos de la aplicación (registros, marcas, variantes e historial).
+  function resetAll() {
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(PREFIX)) keys.push(key);
+    }
+    keys.forEach(key => localStorage.removeItem(key));
+    return keys.length;
+  }
+
+  window.AetherStore = { getExercise, saveExercise, isDone, setDone, getVariant, setVariant, saveSession, listSessions, exportAll, importAll, resetAll };
 })();

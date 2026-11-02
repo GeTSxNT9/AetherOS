@@ -277,6 +277,15 @@
     reader.readAsText(file);
   }
 
+  // Reinicio de datos: borra todo lo guardado en este dispositivo, previa confirmación.
+  function resetData() {
+    const message = 'Se borrarán todos los registros, el historial y las variantes elegidas de este dispositivo. '
+      + 'Esta acción no se puede deshacer.\n\nSi quieres conservarlos, crea antes una copia de seguridad.\n\n¿Reiniciar todos los datos?';
+    if (!confirm(message)) return;
+    AetherStore.resetAll();
+    location.reload();
+  }
+
   // ======================================================================
   // Historial
   // ======================================================================
@@ -412,6 +421,7 @@
     $('settingsBtn').addEventListener('click', () => $('settingsDialog').showModal());
     $('exportBtn').addEventListener('click', exportData);
     $('exportSettings').addEventListener('click', exportData);
+    $('resetBtn').addEventListener('click', resetData);
     $('importInput').addEventListener('change', importData);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
