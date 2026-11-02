@@ -357,6 +357,7 @@ button:disabled { opacity: .45; cursor: not-allowed; }
 .primary-button, .secondary-button { width: 100%; padding: 12px 15px; border-radius: 12px; font-size: 12px; font-weight: 650; }
 .primary-button { background: #dce2ff; border: 0; color: #171923; }
 .secondary-button { margin-top: 10px; background: transparent; border: 1px solid #3a3c46; color: var(--text); }
+.danger-button { width: 100%; margin-top: 10px; padding: 12px 15px; border-radius: 12px; border: 1px solid #5c3439; background: transparent; color: #ff9aa2; font-size: 12px; font-weight: 650; }
 .text-button { padding: 0; background: transparent; border: 0; color: var(--accent); font-size: 11px; text-decoration: none; }
 .backup-strip { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 14px; margin: 22px 2px 0; padding: 14px 0; border-top: 1px solid var(--line); }
 .import-label { cursor: pointer; }
