@@ -334,22 +334,18 @@
     }
   }
 
-  // Descarga la lista de ejercicios del dataset para poder elegir con exactitud las animaciones.
-  async function downloadDatasetNames() {
+  // Descarga qué animación se muestra en cada ejercicio (para fijarlas en la app).
+  async function downloadChosenAnimations() {
     const out = $('auditResult');
     out.hidden = false;
-    const text = await window.AetherAnimations.datasetNames();
-    if (!text) {
-      out.textContent = 'No se pudo cargar el catálogo de animaciones. Conecta a internet e inténtalo de nuevo.';
-      return;
-    }
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }));
+    const text = await window.AetherAnimations.chosenReport();
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'aetheros-nombres-dataset.txt';
+    link.download = 'aetheros-mis-animaciones.txt';
     link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
-    out.textContent = 'Lista descargada.';
+    out.textContent = 'Archivo descargado.';
   }
 
   // ======================================================================
@@ -486,7 +482,7 @@
     $('exportSettings').addEventListener('click', exportData);
     $('importInput').addEventListener('change', importData);
     $('auditBtn').addEventListener('click', auditAnimations);
-    $('namesBtn').addEventListener('click', downloadDatasetNames);
+    $('chosenBtn').addEventListener('click', downloadChosenAnimations);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
 

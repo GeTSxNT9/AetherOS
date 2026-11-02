@@ -70,7 +70,7 @@
     "Curl femoral sentado": ['lever seated leg curl', 'seated leg curl', 'seated machine leg curl'],
     "Curl femoral tumbado": ['lever lying leg curl', 'lying leg curl', 'lying leg curls'],
     "Curl femoral de pie": ['standing single leg curl'],
-    "Curl femoral deslizante": [],
+    "Curl femoral deslizante": ['low glute bridge on floor', 'glute bridge march'],
     "Prensa de piernas inclinada": ['sled 45 leg press', 'lever leg press', 'leg press'],
     "Sentadilla búlgara con mancuernas": ['dumbbell bulgarian split squat', 'bulgarian split squat', 'split squat with dumbbells', 'dumbbell single leg split squat', 'dumbbell split squat', 'single leg split squat'],
     "Extensión de cuádriceps en máquina": ['lever leg extension', 'leg extension', 'leg extensions'],
@@ -96,7 +96,7 @@
     "Patada de glúteo con mancuerna": ['cable standing hip extension'],
     "Puente de glúteos unilateral": ['single leg bridge with outstretched leg', 'single leg glute bridge', 'single leg hip thrust', 'single leg bridge'],
     "Zancada hacia atrás con mancuernas": ['dumbbell reverse lunge', 'reverse dumbbell lunge', 'dumbbell rear lunge'],
-    "Curl bayesiano de bíceps en polea a una mano": [],
+    "Curl bayesiano de bíceps en polea a una mano": ['cable one arm curl', 'cable curl', 'cable concentration curl'],
     "Curl inclinado con mancuernas": ['dumbbell incline biceps curl', 'dumbbell incline curl', 'dumbbell incline alternate bicep curl', 'incline dumbbell curl'],
     "Curl de concentración con mancuerna": ['concentration curl', 'dumbbell concentration curl'],
     "Jalón al pecho con agarre cerrado": ['cable lateral pulldown with v-bar', 'twin handle parallel grip lat pulldown', 'cable underhand pulldown', 'reverse grip machine lat pulldown'],
@@ -263,10 +263,14 @@
     return scored.slice(0, 3).map(x => x.name);
   }
 
-  // Texto con todos los nombres del dataset (uno por línea), para revisar coincidencias.
-  async function datasetNames() {
-    const items = await getDataset();
-    return items.length ? items.map(entry => entry.name).filter(Boolean).sort().join('\n') : '';
+  // Informe "ejercicio => animación que se está mostrando" (una línea por ejercicio y alternativa).
+  async function chosenReport() {
+    const lines = await Promise.all([...routineNames()].map(async name => {
+      const list = await resolveAll(name);
+      const shown = list[Math.min(readPref(name), list.length - 1)];
+      return `${name} => ${shown ? shown.name : '(sin animación)'}${list.length > 1 ? `  [opción ${Math.min(readPref(name), list.length - 1) + 1} de ${list.length}]` : ''}`;
+    }));
+    return lines.join('\n');
   }
 
   // ---- Revisión: qué nombres de la rutina no tienen animación en el dataset ----
@@ -278,5 +282,5 @@
     return { datasetOk: items.length > 0, total: names.length, missing };
   }
 
-  window.AetherAnimations = { hydrate, prefetchRoutine, audit, datasetNames };
+  window.AetherAnimations = { hydrate, prefetchRoutine, audit, chosenReport };
 })();
