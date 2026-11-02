@@ -15,7 +15,7 @@ It is built with HTML, CSS, and JavaScript without an application framework or i
 - Statistics: sessions, total and weekly volume, repetitions, weekly frequency, and evolution of the load per exercise.
 - Rest timer of 2 minutes with vibration alert.
 - Animation of every exercise and alternative.
-- JSON backups: export and import.
+- JSON backups: export and import, and a data reset option.
 - Installable PWA with a floating bottom navigation bar and offline operation.
 
 ## Current Architecture
@@ -54,6 +54,7 @@ AetherOS-main/
 - The "done" mark stores the date on which it was set, so every exercise appears unmarked when the day changes. Weight, repetitions, and RIR are kept to show the last performance.
 - Volume is calculated as weight × repetitions × sets, and total repetitions as repetitions × sets.
 - Exported backups (`aetheros-backup-v2`) are the recommended way to move or recover data. Import validates the whole file before writing and merges the compatible records with the local data. Make an export before updating the application or clearing browser data.
+- The options dialog includes a data reset button. After confirmation, it deletes every `aetheros_v2_*` key (records, marks, variants, and history); it does not affect the installed application or its cache. A backup should be exported beforehand if the data is to be recovered.
 - Do not manually delete `aetheros_v2_*` keys if you want to keep the data.
 - Data does not leave the device and is not synchronized between devices.
 
