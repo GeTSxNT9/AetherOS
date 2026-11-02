@@ -1,7 +1,7 @@
 /* AetherOS · service worker (modo sin conexión).
  * Al publicar cambios en la app, sube el número de CACHE_VERSION para que los móviles
  * descarguen los archivos nuevos. */
-const CACHE_VERSION = '3.1.0';
+const CACHE_VERSION = '4.0.0';
 const CACHE = `aetheros-v${CACHE_VERSION}`;
 const MEDIA_CACHE = 'aetheros-gymvisual-v1'; // GIF de ejercicios; debe coincidir con exercise-animations.js
 const CORE = [
@@ -14,6 +14,13 @@ const isExerciseAsset = url =>
   (url.hostname === 'raw.githubusercontent.com' && url.pathname.startsWith('/hasaneyldrm/exercises-dataset/main/')) ||
   (['gymvisual.com', 'www.gymvisual.com'].includes(url.hostname) && url.pathname.endsWith('.gif'));
 
+// Versiones anteriores guardaban aquí el catálogo completo de ejercicios (16 MB); ya no se usa.
+async function dropOldCatalog() {
+  const cache = await caches.open(MEDIA_CACHE);
+  const requests = await cache.keys();
+  await Promise.all(requests.filter(request => request.url.includes('/data/exercises.json')).map(request => cache.delete(request)));
+}
+
 self.addEventListener('install', event => {
   // cache: 'reload' evita que se guarde una copia antigua que el navegador tuviera en su caché HTTP.
   event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE.map(path => new Request(path, { cache: 'reload' })))));
@@ -24,6 +31,12 @@ self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
       .then(keys => Promise.all(keys.filter(key => key !== CACHE && key !== MEDIA_CACHE).map(key => caches.delete(key))))
+      .then(() => caches.open(MEDIA_CACHE))
+      .then(cache => cache.keys().then(requests => Promise.all(
+        // Elimina el catálogo completo (16 MB) que guardaban versiones anteriores.
+        requests.filter(request => request.url.includes('exercises.json')).map(request => cache.delete(request))
+      )))
+      .then(() => dropOldCatalog())
       .then(() => self.clients.claim())
   );
 });
