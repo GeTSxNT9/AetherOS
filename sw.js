@@ -1,12 +1,12 @@
 /* AetherOS · service worker (modo sin conexión).
  * Al publicar cambios en la app, sube el número de CACHE_VERSION para que los móviles
  * descarguen los archivos nuevos. */
-const CACHE_VERSION = '2.9.1';
+const CACHE_VERSION = '3.0.0';
 const CACHE = `aetheros-v${CACHE_VERSION}`;
 const MEDIA_CACHE = 'aetheros-gymvisual-v1'; // GIF de ejercicios; debe coincidir con exercise-animations.js
 const CORE = [
   './', './index.html', './manifest.json', './css/aetheros.css',
-  './icons/aetheros-192.png', './icons/aetheros-512.png',
+  './favicon-32.png', './apple-touch-icon.png', './icon-192.png', './icon-512.png',
   './js/routine-data.js', './js/tracker-store.js', './js/exercise-animations.js', './js/app.js'
 ];
 

@@ -55,5 +55,9 @@ Las animaciones se resuelven por listas explícitas de nombres del catálogo [ha
 - Curl bayesiano y curl femoral deslizante con animación aproximada.
 - Opciones: «Descargar mis animaciones elegidas» (sustituye a la descarga de la lista del dataset).
 
+## Versión 3.0.0
+- Animaciones fijas (una por ejercicio) y eliminado el sistema de cambio y revisión.
+- Nuevo icono de mancuerna. Los iconos (`apple-touch-icon.png`, `favicon-32.png`, `icon-192.png`, `icon-512.png`) están ahora en la raíz del repositorio; la carpeta `icons/` ya no se usa y puede borrarse.
+
 ## Cómo publicar una actualización
 Sube los archivos modificados conservando sus rutas. Si cambias cualquier archivo de la app, sube también `CACHE_VERSION` en `sw.js` para que los móviles descarguen la versión nueva. Tras publicar, abre la app dos veces (la primera instala la actualización, la segunda la muestra).
