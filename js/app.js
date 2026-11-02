@@ -319,6 +319,17 @@
     reader.readAsText(file);
   }
 
+  // Descarga la lista de direcciones de GIF de la rutina.
+  async function downloadGifList() {
+    const text = await window.AetherAnimations.gifList();
+    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain;charset=utf-8' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'aetheros-direcciones-gif.txt';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   // ======================================================================
   // Historial
   // ======================================================================
@@ -455,6 +466,7 @@
     $('exportBtn').addEventListener('click', exportData);
     $('exportSettings').addEventListener('click', exportData);
     $('importInput').addEventListener('change', importData);
+    $('gifUrlsBtn').addEventListener('click', downloadGifList);
     $('refreshHistory').addEventListener('click', renderHistory);
     $('exerciseStatFilter').addEventListener('change', renderStats);
 

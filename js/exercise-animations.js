@@ -141,19 +141,39 @@
     return indexed.map;
   }
 
+  // Direcciones de GIF ya resueltas, guardadas en el dispositivo (fuera de las copias de seguridad).
+  // Gracias a ellas el catálogo completo (muy pesado) solo se descarga la primera vez.
+  const MEMORY_KEY = 'aetheros_gif_urls';
+  const readMemory = () => {
+    try { return JSON.parse(localStorage.getItem(MEMORY_KEY)) || {}; } catch { return {}; }
+  };
+  const remember = (key, entry) => {
+    try { localStorage.setItem(MEMORY_KEY, JSON.stringify({ ...readMemory(), [key]: entry })); } catch { /* sin almacenamiento */ }
+  };
+  const toMatch = entry => {
+    const file = String(entry.file).replace(/^\.\//, '');
+    const url = new URL(file, RAW_BASE);
+    url.searchParams.set('v', ASSET_VERSION);
+    return { url: url.href, file, name: entry.name, attribution: ATTRIBUTION };
+  };
+
   // ---- Animación de un ejercicio (o null si no está en el catálogo) ----
   function resolve(name) {
     const key = norm(name);
     if (resultCache.has(key)) return resultCache.get(key);
-    const promise = getDataset().then(items => {
-      if (!items.length) { resultCache.delete(key); return null; } // sin catálogo: se reintentará más tarde
+    const promise = (async () => {
       const wanted = ALLOWED.get(key);
-      const item = wanted && indexOf(items).get(wanted);
+      if (!wanted) return null;
+      const saved = readMemory()[key];
+      if (saved && saved.dataset === wanted) return toMatch(saved);
+      const items = await getDataset();
+      if (!items.length) { resultCache.delete(key); return null; } // sin catálogo: se reintentará más tarde
+      const item = indexOf(items).get(wanted);
       if (!item) return null;
-      const url = new URL(String(item.gif_url).replace(/^\.\//, ''), RAW_BASE);
-      url.searchParams.set('v', ASSET_VERSION);
-      return { url: url.href, name: item.name, attribution: item.attribution || ATTRIBUTION };
-    });
+      const entry = { dataset: wanted, name: item.name, file: item.gif_url };
+      remember(key, entry);
+      return toMatch(entry);
+    })();
     resultCache.set(key, promise);
     return promise;
   }
@@ -203,5 +223,19 @@
     }
   }
 
-  window.AetherAnimations = { hydrate, prefetchRoutine };
+  // Lista "ejercicio => archivo del GIF" de toda la rutina (para fijarla en el código).
+  async function gifList() {
+    const names = new Set();
+    Object.values(window.AETHER_ROUTINE || {}).forEach(day => day.exercises.forEach(ex => {
+      names.add(ex.name);
+      ex.alternatives.forEach(alt => names.add(alt[0]));
+    }));
+    const lines = await Promise.all([...names].map(async name => {
+      const match = await resolve(name);
+      return `${name} => ${match ? match.file : '(sin animación)'}`;
+    }));
+    return lines.join('\n');
+  }
+
+  window.AetherAnimations = { hydrate, prefetchRoutine, gifList };
 })();
