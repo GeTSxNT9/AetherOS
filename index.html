@@ -29,65 +29,26 @@
     <p class="muted" id="subhead">Una sesión cada vez. Progreso que se acumula.</p>
   </section>
 
-  <!-- ENTRENAR -->
-  <section id="trainingView" class="view-panel">
-    <nav class="day-picker" id="dayPicker" aria-label="Elegir día de entrenamiento"></nav>
-    <section class="session-summary">
-      <div><p class="eyebrow">SESIÓN</p><h2 id="dayTitle">Lunes</h2><p class="muted" id="dayFocus"></p></div>
-      <div class="completion"><strong id="progressText">0%</strong><span>completado</span></div>
-      <div class="progress-track"><span id="progressFill"></span></div>
-    </section>
-    <section class="session-tools"><span id="exerciseCount">0 ejercicios</span></section>
-    <section id="exerciseList" class="exercise-list" aria-live="polite"></section>
-    <div class="timer-bar" id="restTimer">
-      <span class="timer-title">Descanso</span>
-      <strong id="timerDisplay">02:00</strong>
-      <button id="timerStart" class="small-button" type="button">Iniciar</button>
-      <button id="timerReset" class="small-button" type="button" aria-label="Reiniciar cronómetro">↺</button>
-    </div>
+  <nav class="day-picker" id="dayPicker" aria-label="Elegir día de entrenamiento"></nav>
+  <section class="session-summary">
+    <div><p class="eyebrow">SESIÓN</p><h2 id="dayTitle">Lunes</h2><p class="muted" id="dayFocus"></p></div>
+    <div class="completion"><strong id="progressText">0%</strong><span>completado</span></div>
+    <div class="progress-track"><span id="progressFill"></span></div>
   </section>
-
-  <!-- HISTORIAL -->
-  <section id="historyView" class="view-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">TU RECORRIDO</p><h2>Historial de sesiones</h2></div><button class="small-button" id="refreshHistory" type="button">Actualizar</button></div>
-    <div id="historyList" class="history-list"></div>
-  </section>
-
-  <!-- ESTADÍSTICAS -->
-  <section id="statsView" class="view-panel" hidden>
-    <div class="section-head"><div><p class="eyebrow">DATOS REALES</p><h2>Estadísticas</h2></div></div>
-    <div class="stats-grid" id="statsSummary"></div>
-    <section class="card">
-      <h3>Volumen por sesión</h3>
-      <p class="muted">Suma de peso × repeticiones registradas.</p>
-      <div id="volumeChart" class="chart" aria-label="Gráfico de volumen por sesión"></div>
-      <h3>Volumen semanal</h3>
-      <div id="weeklyVolumeChart" class="chart" aria-label="Comparación de volumen semanal"></div>
-    </section>
-    <section class="card">
-      <h3>Evolución de cargas</h3>
-      <p class="muted">Carga máxima registrada por ejercicio.</p>
-      <label class="chart-filter">Ejercicio <select id="exerciseStatFilter"></select></label>
-      <div id="loadChart" class="chart" aria-label="Gráfico de cargas"></div>
-    </section>
-    <section class="card">
-      <h3>Repeticiones y frecuencia</h3>
-      <div id="repChart" class="chart"></div>
-      <div id="frequencyChart" class="chart"></div>
-    </section>
-  </section>
+  <section class="session-tools"><span id="exerciseCount">0 ejercicios</span></section>
+  <section id="exerciseList" class="exercise-list" aria-live="polite"></section>
+  <div class="timer-bar" id="restTimer">
+    <span class="timer-title">Descanso</span>
+    <strong id="timerDisplay">02:00</strong>
+    <button id="timerStart" class="small-button" type="button">Iniciar</button>
+    <button id="timerReset" class="small-button" type="button" aria-label="Reiniciar cronómetro">↺</button>
+  </div>
 
   <section class="backup-strip">
     <button class="text-button" id="exportBtn" type="button">Exportar copia de seguridad</button>
     <label class="text-button import-label">Importar copia<input id="importInput" type="file" accept="application/json"></label>
   </section>
 </main>
-
-<nav class="bottom-nav" aria-label="Navegación principal">
-  <button type="button" data-view="training" class="active" aria-current="page"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect class="tone" x="5.2" y="6" width="3" height="12" rx="1"/><rect class="tone" x="15.8" y="6" width="3" height="12" rx="1"/><rect x="5.2" y="6" width="3" height="12" rx="1"/><rect x="15.8" y="6" width="3" height="12" rx="1"/><path d="M2.5 9.5v5M21.5 9.5v5M8.2 12h7.6"/></svg></span><small>Entrenar</small></button>
-  <button type="button" data-view="history"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle class="tone" cx="12" cy="12" r="8.5"/><path d="M3.6 12a8.5 8.5 0 1 0 2.5-6M3.6 4.6v3.9h3.9"/><path d="M12 7.6V12l3 1.9"/></svg></span><small>Historial</small></button>
-  <button type="button" data-view="stats"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect class="tone" x="4.5" y="12" width="3.6" height="7.5" rx="1.2"/><rect class="tone" x="10.2" y="5" width="3.6" height="14.5" rx="1.2"/><rect class="tone" x="15.9" y="9" width="3.6" height="10.5" rx="1.2"/><rect x="4.5" y="12" width="3.6" height="7.5" rx="1.2"/><rect x="10.2" y="5" width="3.6" height="14.5" rx="1.2"/><rect x="15.9" y="9" width="3.6" height="10.5" rx="1.2"/></svg></span><small>Estadísticas</small></button>
-</nav>
 
 <dialog id="settingsDialog" class="settings-dialog">
   <form method="dialog">

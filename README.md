@@ -1,6 +1,6 @@
 # AetherOS
 
-**AetherOS** (Sessio Log) is a Progressive Web Application (PWA) to follow a Monday-to-Friday training routine, record the weight, repetitions, and RIR of each exercise, apply a double-progression criterion, and review the session history and progress statistics.
+**AetherOS** (Sessio Log) is a Progressive Web Application (PWA) to follow a Monday-to-Friday training routine, record the weight, repetitions, and RIR of each exercise, apply a double-progression criterion, and keep the last performance available for the next session.
 
 The application is implemented in vanilla HTML, CSS, and JavaScript, with no framework or server-side component. Working data is stored locally in the browser of the device; there are no accounts and no synchronization.
 
@@ -11,24 +11,22 @@ The application is implemented in vanilla HTML, CSS, and JavaScript, with no fra
 - Recording of a single weight, repetition, and RIR value per exercise; the decimal comma is accepted.
 - Variant switching per exercise, with independent records for each variant.
 - Double-progression suggestion when the top of the repetition range is reached with the planned RIR.
-- Automatic session history, with the detail of every exercise.
-- Statistics: sessions, volume, repetitions, weekly frequency, and evolution of the load per exercise.
 - Rest timer, JSON backups (export and import), and data reset.
 - Animation of every exercise and alternative.
-- Installable PWA with a floating bottom navigation bar and offline operation.
+- Installable PWA with offline operation.
 
 ## Current Architecture
 
 ```text
 AetherOS-main/
-├── index.html                  # Interface, views, and ordered module loading
+├── index.html                  # Interface and ordered module loading
 ├── css/
-│   └── aetheros.css            # Visual design, layout, bottom dock, and responsive rules
+│   └── aetheros.css            # Visual design, layout, rest timer, and responsive rules
 ├── js/
 │   ├── routine-data.js         # Routine: days, exercises, alternatives, execution, and tips
-│   ├── tracker-store.js        # localStorage access, sessions, backups, and reset
+│   ├── tracker-store.js        # localStorage access, backups, and reset
 │   ├── exercise-animations.js  # Exercise-to-animation catalog and GIF display
-│   └── app.js                  # Interface, logging, progression, history, statistics, and timer
+│   └── app.js                  # Interface, logging, progression, and timer
 ├── manifest.json               # PWA installation metadata
 ├── sw.js                       # Installation, update, and offline cache
 ├── icon-192.png
@@ -44,13 +42,13 @@ AetherOS-main/
 - `routine-data.js` is the single source of the routine. The `id` of each exercise is the key under which its records are stored, so it should not be modified if the existing records are to be kept.
 - `tracker-store.js` is the only module that reads and writes training data in `localStorage`; `app.js` accesses it through the `AetherStore` interface.
 - `exercise-animations.js` assigns to every exercise and alternative the exact file of its animation. A new exercise added to the routine requires its corresponding line in this catalog; without it, a notice is shown instead of the animation.
-- `css/aetheros.css` contains the application styles: layout, component appearance, bottom dock, and responsive behavior. It is separate from the HTML so visual changes can be maintained without editing the application logic.
+- `css/aetheros.css` contains the application styles: layout, component appearance, rest timer, and responsive behavior. It is separate from the HTML so visual changes can be maintained without editing the application logic.
 - This separation is architectural, not a claim that a test suite is included in the repository.
 
 ## Data and Persistence
 
-- `localStorage` stores, under the `aetheros_v2_` prefix, the records per exercise and variant, the "done" marks, the selected variants, and the history sessions.
-- Volume is calculated as weight × repetitions × sets. Weight, repetitions, and RIR are not cleared when the day changes, so the last performance remains visible.
+- `localStorage` stores, under the `aetheros_v2_` prefix, the records per exercise and variant, the "done" marks, and the selected variants.
+- Weight, repetitions, and RIR are not cleared when the day changes, so the last performance remains visible.
 - Do not manually delete `aetheros_v2_*` keys if you want to keep the data.
 - Exported backups are the recommended way to move or recover data. Make an export before updating the application or using the data reset option. Import validates the whole file before writing anything.
 - Data does not leave the device and is not synchronized between devices.
