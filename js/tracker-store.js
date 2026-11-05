@@ -58,7 +58,6 @@
   function saveExercise(day, id, value, variantName = null) {
     const variantKey = slug(variantName || 'principal');
     write(`exercise_${day}_${id}_${variantKey}`, { ...value, variant: variantName || null, updatedAt: new Date().toISOString() });
-    saveSession(day);
   }
 
   // La marca de "hecho" guarda la fecha en que se marcó: al cambiar de día deja de contar
@@ -66,74 +65,11 @@
   const isDone = (day, id) => read(`done_${day}_${id}`, false) === todayKey();
   function setDone(day, id, value) {
     write(`done_${day}_${id}`, value ? todayKey() : false);
-    saveSession(day);
   }
 
   const getVariant = (day, id) => read(`variant_${day}_${id}`, null);
   function setVariant(day, id, value) {
     write(`variant_${day}_${id}`, value);
-    saveSession(day);
-  }
-
-  // ---------- Sesiones (una por día de la semana y fecha) ----------
-  const hasData = entry => entry.weight !== '' || entry.reps !== '' || entry.rir !== '' || entry.done;
-
-  function saveSession(day) {
-    const routine = window.AETHER_ROUTINE?.[day];
-    if (!routine) return;
-
-    const date = todayKey();
-    const key = `session_${date}_${slug(day)}`;
-    const previous = read(key, null) || {};
-    const entries = [];
-
-    routine.exercises.forEach(ex => {
-      const variant = getVariant(day, ex.id);
-      const activeName = variant?.name || ex.name;
-      const record = getExercise(day, ex.id, variant?.name || null);
-
-      // Si hoy cambiaste de variante, se conserva lo que ya habías registrado con la anterior.
-      (previous.entries || [])
-        .filter(e => e.exerciseId === ex.id && e.name !== activeName && hasData(e))
-        .forEach(e => entries.push(e));
-
-      entries.push({
-        exerciseId: ex.id,
-        name: activeName,
-        baseName: ex.name,
-        variant: variant?.name || null,
-        sets: variant?.sets || ex.sets,
-        targetReps: variant?.reps || ex.reps,
-        targetRir: ex.rir,
-        weight: record.weight || '',
-        reps: record.reps || '',
-        rir: record.rir || '',
-        done: isDone(day, ex.id)
-      });
-    });
-
-    if (!entries.some(hasData) && !previous.startedAt) return;
-    write(key, {
-      date,
-      day,
-      focus: routine.focus,
-      startedAt: previous.startedAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      entries
-    });
-  }
-
-  function listSessions() {
-    const sessions = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key || !key.startsWith(`${PREFIX}session_`)) continue;
-      try {
-        const value = JSON.parse(localStorage.getItem(key));
-        if (value && value.date && value.entries) sessions.push(value);
-      } catch { /* registro dañado: se ignora */ }
-    }
-    return sessions.sort((a, b) => `${b.date}${b.day}`.localeCompare(`${a.date}${a.day}`));
   }
 
   // ---------- Copia de seguridad ----------
@@ -180,5 +116,5 @@
     return keys.length;
   }
 
-  window.AetherStore = { getExercise, saveExercise, isDone, setDone, getVariant, setVariant, saveSession, listSessions, exportAll, importAll, resetAll };
+  window.AetherStore = { getExercise, saveExercise, isDone, setDone, getVariant, setVariant, exportAll, importAll, resetAll };
 })();

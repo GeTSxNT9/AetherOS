@@ -1,5 +1,4 @@
-/* AetherOS · lógica principal de la interfaz.
- * Pantallas: Entrenar (rutina + registro), Historial y Estadísticas. */
+/* AetherOS · lógica principal de la interfaz: rutina, registro, progresión y temporizador. */
 (() => {
   'use strict';
 
@@ -8,7 +7,6 @@
   const DAY_INITIALS = ['L', 'M', 'X', 'J', 'V'];
   const WEEKDAYS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
   const REST_SECONDS = 120;
-  const VIEWS = ['training', 'history', 'stats'];
 
   const $ = id => document.getElementById(id);
   let currentDay = DAYS[0];
@@ -22,22 +20,11 @@
   const norm = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   // "8–12 por lado" → "8–12 reps por lado"; los textos que empiezan por RIR se dejan igual.
   const repsLabel = reps => /^\d/.test(reps) ? String(reps).replace(/^(\d+(?:\s*[–-]\s*\d+)?)/, '$1 reps') : String(reps);
-  const formatKg = value => Math.round(value).toLocaleString('es-ES');
 
   const dateKey = () => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
-
-  // Semana ISO ("2026 S43") a partir de una fecha "AAAA-MM-DD".
-  function isoWeekKey(dateString) {
-    const [year, month, day] = String(dateString).split('-').map(Number);
-    const d = new Date(Date.UTC(year, month - 1, day));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-    const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-    return `${d.getUTCFullYear()} S${String(week).padStart(2, '0')}`;
-  }
 
   // Un único número por campo; se admite coma decimal ("62,5" = 62.5 kg).
   // Si un registro antiguo contiene varios valores ("40;40;35"), se usa el primero.
@@ -47,24 +34,6 @@
     const number = Number(clean.replace(',', '.'));
     return clean !== '' && Number.isFinite(number) && number >= 0 ? number : null;
   }
-
-  // ======================================================================
-  // Cálculos de volumen y repeticiones
-  // ======================================================================
-  // Volumen = peso × repeticiones × series; repeticiones totales = repeticiones × series.
-  const entrySets = entry => Math.max(1, Number(entry.sets) || 1);
-
-  function entryVolume(entry) {
-    const weight = toNumber(entry.weight);
-    const reps = toNumber(entry.reps);
-    return weight === null || reps === null ? 0 : weight * reps * entrySets(entry);
-  }
-
-  const entryReps = entry => (toNumber(entry.reps) ?? 0) * entrySets(entry);
-
-  const sessionVolume = session => session.entries.reduce((sum, e) => sum + entryVolume(e), 0);
-  const sessionReps = session => session.entries.reduce((sum, e) => sum + entryReps(e), 0);
-  const flattenEntries = sessions => sessions.flatMap(s => s.entries.map(e => ({ ...e, date: s.date, day: s.day })));
 
   // ======================================================================
   // Entrenar: ejercicios, variantes y progresión
@@ -92,8 +61,7 @@
     if (reps === null || rir === null || weight === null) return null;
 
     const expectedRir = Number((String(ex.rir).match(/\d+/) || ['2'])[0]);
-    const lowestRir = /ultima serie\s*1/.test(norm(ex.rir)) ? 1 : expectedRir; // p. ej. "2 (última serie 1)"
-    if (reps < top || rir < lowestRir || rir > expectedRir + 1) return null;
+    if (reps < top || rir < expectedRir || rir > expectedRir + 1) return null;
 
     const muscle = norm(ex.muscle);
     const name = norm(active.name);
@@ -287,120 +255,8 @@
   }
 
   // ======================================================================
-  // Historial
+  // Arranque
   // ======================================================================
-  function historyCardMarkup(session) {
-    const withData = session.entries.filter(e => e.weight !== '' || e.reps !== '' || e.rir !== '' || e.done);
-    const completed = session.entries.filter(e => e.done).length;
-    const longDate = new Date(`${session.date}T12:00:00`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-    const rows = session.entries.map(e =>
-      `<div><b>${esc(e.name)}</b><span>${esc(e.sets)} series · ${esc(e.weight || '—')} kg · Reps ${esc(e.reps || '—')} · RIR ${esc(e.rir || '—')}</span></div>`).join('');
-
-    return `<article class="history-card"><div class="history-head"><div><b>${esc(longDate)}</b><small>${esc(session.day)} · ${esc(session.focus || '')}</small></div><strong>${formatKg(sessionVolume(session))} kg</strong></div><p>${withData.length} ejercicios con registros · ${completed} completados</p><details><summary>Ver ejercicios y resultados</summary><div class="history-entries">${rows}</div></details></article>`;
-  }
-
-  function renderHistory() {
-    const sessions = AetherStore.listSessions();
-    $('historyList').innerHTML = sessions.length
-      ? sessions.map(historyCardMarkup).join('')
-      : '<div class="empty-state">Todavía no hay sesiones guardadas. Registra peso, repeticiones o RIR durante un entrenamiento y aparecerá aquí.</div>';
-  }
-
-  // ======================================================================
-  // Estadísticas
-  // ======================================================================
-  // Barras horizontales: etiqueta · barra proporcional · valor.
-  function barChart(items, format = x => x) {
-    if (!items.length) return '<div class="empty-state">Aún faltan datos para mostrar este gráfico.</div>';
-    const max = Math.max(1, ...items.map(x => x.value));
-    return `<div class="bar-chart">${items.map(x =>
-      `<div class="bar-item"><small>${esc(x.label)}</small><div class="bar-track"><span style="width:${Math.max(3, x.value / max * 100)}%"></span></div><b>${esc(format(x.value))}</b></div>`).join('')}</div>`;
-  }
-
-  // Línea con puntos (SVG) para la evolución de la carga máxima.
-  function lineChart(items) {
-    if (items.length < 2) return '<div class="empty-state">Registra al menos dos valores para ver una evolución.</div>';
-
-    const W = 320, H = 160, left = 14, right = 14, top = 26, bottom = 30;
-    const values = items.map(x => x.value);
-    const max = Math.max(...values), min = Math.min(...values), span = max - min || 1;
-    const x = i => left + (W - left - right) * i / (items.length - 1);
-    const y = value => top + (H - top - bottom) * (1 - (value - min) / span);
-    const points = items.map((item, i) => [x(i), y(item.value)]);
-    const line = points.map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`).join(' ');
-    const area = `${left},${H - bottom} ${line} ${W - right},${H - bottom}`;
-
-    // Se evita que las etiquetas de fecha se solapen cuando hay muchos puntos.
-    const step = Math.ceil(items.length / 6);
-    const showLabel = i => i === items.length - 1 || (i % step === 0 && items.length - 1 - i >= step);
-
-    const dots = points.map(([px, py], i) => `<circle class="dot" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="3.6"/>${
-      items.length <= 8 || i === 0 || i === items.length - 1 || items[i].value === max
-        ? `<text class="value" x="${px.toFixed(1)}" y="${(py - 9).toFixed(1)}">${esc(items[i].value)}</text>` : ''}`).join('');
-    const labels = items.map((item, i) => showLabel(i) ? `<text x="${x(i).toFixed(1)}" y="${H - 10}">${esc(item.label)}</text>` : '').join('');
-
-    return `<svg class="line-chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Evolución de la carga máxima"><line class="grid" x1="${left}" y1="${H - bottom}" x2="${W - right}" y2="${H - bottom}"/><polygon class="area" points="${area}"/><polyline class="path" points="${line}"/>${dots}${labels}</svg>`;
-  }
-
-  const lastN = (items, n) => items.slice(-n);
-  const byWeek = (sessions, valueOf) => {
-    const totals = {};
-    sessions.forEach(s => { const key = isoWeekKey(s.date); totals[key] = (totals[key] || 0) + valueOf(s); });
-    return lastN(Object.entries(totals), 8).map(([label, value]) => ({ label, value }));
-  };
-
-  function renderStats() {
-    const sessions = AetherStore.listSessions();
-    const chronological = sessions.slice().reverse(); // de más antigua a más reciente
-    const entries = flattenEntries(chronological);
-
-    $('statsSummary').innerHTML = [
-      ['Sesiones', sessions.length],
-      ['Volumen total', `${formatKg(sessions.reduce((sum, s) => sum + sessionVolume(s), 0))} kg`],
-      ['Repeticiones', sessions.reduce((sum, s) => sum + sessionReps(s), 0)],
-      ['Ejercicios registrados', entries.length]
-    ].map(([label, value]) => `<div class="stat-tile"><small>${label}</small><b>${value}</b></div>`).join('');
-
-    $('volumeChart').innerHTML = barChart(
-      lastN(chronological, 8).map(s => ({ label: `${s.date.slice(5)} ${s.day.slice(0, 3)}`, value: sessionVolume(s) })), formatKg);
-    $('weeklyVolumeChart').innerHTML = barChart(byWeek(chronological, sessionVolume), formatKg);
-
-    // Selector de ejercicio para la evolución de cargas
-    const select = $('exerciseStatFilter');
-    const previous = select.value;
-    const names = [...new Set(entries.map(e => e.name))].sort();
-    select.innerHTML = '<option value="">Selecciona un ejercicio</option>' + names.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
-    if (names.includes(previous)) select.value = previous;
-    const chosen = select.value || names[0];
-    if (chosen && !select.value) select.value = chosen;
-
-    const loads = entries
-      .filter(e => e.name === chosen && toNumber(e.weight) !== null)
-      .slice(-12)
-      .map(e => ({ label: e.date.slice(5), value: toNumber(e.weight) }));
-    $('loadChart').innerHTML = lineChart(loads);
-
-    $('repChart').innerHTML = '<h4>Repeticiones por sesión</h4>' +
-      barChart(lastN(chronological, 8).map(s => ({ label: s.date.slice(5), value: sessionReps(s) })), v => v);
-    $('frequencyChart').innerHTML = '<h4>Frecuencia semanal</h4>' +
-      barChart(byWeek(chronological, () => 1), v => `${v} ses.`);
-  }
-
-  // ======================================================================
-  // Navegación y arranque
-  // ======================================================================
-  function showView(view) {
-    VIEWS.forEach(v => { $(`${v}View`).hidden = v !== view; });
-    document.querySelectorAll('[data-view]').forEach(button => {
-      const active = button.dataset.view === view;
-      button.classList.toggle('active', active);
-      if (active) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current');
-    });
-    if (view === 'history') renderHistory();
-    if (view === 'stats') renderStats();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
   function init() {
     // Limpieza de datos de versiones de prueba anteriores (animaciones elegidas y direcciones recordadas).
     Object.keys(localStorage).filter(key => key.startsWith('aetheros_v2_anim_') || key === 'aetheros_gif_urls').forEach(key => localStorage.removeItem(key));
@@ -416,15 +272,12 @@
     renderDayPicker();
     renderSession();
     wireTimer();
-    document.querySelectorAll('[data-view]').forEach(button => button.addEventListener('click', () => showView(button.dataset.view)));
 
     $('settingsBtn').addEventListener('click', () => $('settingsDialog').showModal());
     $('exportBtn').addEventListener('click', exportData);
     $('exportSettings').addEventListener('click', exportData);
     $('resetBtn').addEventListener('click', resetData);
     $('importInput').addEventListener('change', importData);
-    $('refreshHistory').addEventListener('click', renderHistory);
-    $('exerciseStatFilter').addEventListener('change', renderStats);
 
     if ('serviceWorker' in navigator && location.protocol !== 'file:') {
       navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then(reg => reg.update()).catch(() => {});
